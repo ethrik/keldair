@@ -116,6 +116,10 @@ sub hook_add {
 	$this->hook_set($name, $sub);
 }
 
+## hook_run(str, str, ...)
+# Run all hooks of a particular event with a list of arguments
+# @event IRC Event to run hooks with (JOIN, PART, KICK, etc)
+# @args A list of args to run with the hook - you can send as many arguments as needed after the event str
 sub hook_run {
 	my ($this, $event, @args) = @_;
 
