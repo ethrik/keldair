@@ -86,6 +86,36 @@ has 'home' => (
 	default => $config->get('keldair/home')
 );
 
+## hooks { }
+# Hash-Ref of event hooks on IRC
+# Hook-Type => Anon. Subroutine
+has 'hooks' => (
+	traits => ['Hash'],
+	is => 'ro',
+	isa => 'HashRef[CodeRef]',
+	default => sub { {} },
+	handles => {
+		set_option => 'set',
+		get_option => 'get',
+		has_no_options => 'is_empty',
+		num_options => 'count',
+		delete_option => 'delete',
+		option_pairs => 'kv'
+	}
+);
+
+## hook_add(str, str, coderef)
+# Hook to an IRC event
+# @event IRC-Name of event (JOIN, PART, KICK, etc)
+# @title Unique-Name:Signed-Integer, ex: act:1, act:-3 - determines which will be called first
+# @sub Anonymous Subroutine reference for acting on the hook
+sub hook_add {
+	my ($this, $event, $title, $sub) = @_;
+	my $name = $event.'/'.$title;
+	$this->log(HOOK => "Adding new hook: $name");
+	$this->set_option($name, $sub);
+}
+
 ## config(str)
 # Retrieve a config value from keldair.conf
 # @directive JSON Directive where to find the value
@@ -159,6 +189,11 @@ sub joinChannel {
 	$this->raw("JOIN $chan");
 }
 
+sub msg {
+	my ($this, $target, $msg) = @_;
+	$this->raw("PRIVMSG $target :$msg");
+}
+
 ## parse(str)
 # Start parsing an IRC line.
 # @line \n-Terminated line from the server
@@ -184,6 +219,20 @@ sub parse {
 	{
 		$this->log(INFO => 'Server has accepted my connection, joining the home channel.');
 		$this->joinChannel($this->home);
+	}
+	if($s[1] eq 'JOIN')
+	{
+		my $nick = (split '!', $s[0])[0];
+		$nick = substr $nick, 1;
+		my $chan = $s[2];
+		
+		for my $hook ($this->option_pairs)
+		{
+			my $event = (split '/', $hook->[0])[0];
+			next unless $event eq 'JOIN';
+			my $title = (split '/', $hook->[0])[1];
+			$hook->[1]->($chan, $nick);
+		}
 	}
 	if($s[0] eq 'PING')
 	{

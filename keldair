@@ -6,12 +6,13 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Keldair;
-
+use Test;
 my $sock = $keldair->connect();
 while(my $buffer = <$sock>)
 {
 	print "R: $buffer" if $keldair->debug;
 	chomp $buffer;
+	chop $buffer;
 	$keldair->parse($buffer);
 }
 
