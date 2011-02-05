@@ -6,6 +6,7 @@
 
 use strict;
 use warnings;
+use Class::Keldair;
 
 package Keldair;
 
@@ -17,3 +18,4 @@ our (%V) = (
 
 our $VERSION = "$V{MAJOR}.$V{MINOR}.$V{PATCH}";
 
+our $keldair = Class::Keldair->new();
