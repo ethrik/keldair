@@ -1,0 +1,13 @@
+=encoding utf8
+
+=head1 NAME
+
+Keldair - A sexy IRC Bot in Perl.
+
+=head1 SYNOPSIS
+
+This delicious little bot written with IO::Socket. With all the other
+pieces of garbage that consider themselves IRC Bots (Auto), this one
+will be unique, readble, and not in any way a repitition of another bot.
+
+=cut
