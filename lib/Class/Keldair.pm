@@ -5,7 +5,7 @@ package Class::Keldair;
 
 # soemone will probably want to move this to a different location later...
 my $config = Config::JSON->new('keldair.conf');
-open my $logfile, '<', 'keldair.log';
+open my $logfile, '<', $config->get('keldair/log');
 
 ## nick(str)
 # Nickname to register with - this may be truncated depending on length limit on server.
