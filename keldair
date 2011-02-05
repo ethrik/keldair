@@ -5,4 +5,14 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
+use Keldair;
 
+my $sock = $keldair->connect();
+while(my $buffer = <$sock>)
+{
+	print "R: $buffer" if $keldair->debug;
+	chomp $buffer;
+	$keldair->parse($buffer);
+}
+
+close $sock;

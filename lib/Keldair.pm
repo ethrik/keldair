@@ -1,12 +1,12 @@
 # Keldair.pm - IRC client library
 # Copyright 2011 Alexandria M. Wolcott <alyx@woomoo.org>
 # Licensed under the 3-clause BSD.
-
+package Keldair;
 use strict;
 use warnings;
 use Class::Keldair;
-
-package Keldair;
+use base 'Exporter';
+our @EXPORT = qw($keldair);
 
 our (%V) = (
     'MAJOR' => 0,
@@ -15,5 +15,6 @@ our (%V) = (
 );
 
 our $VERSION = "$V{MAJOR}.$V{MINOR}.$V{PATCH}";
-
 our $keldair = Class::Keldair->new();
+
+1;
