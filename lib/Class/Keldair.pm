@@ -1,7 +1,7 @@
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
 package Class::Keldair;
-use Moose;
+use Mouse;
 use Config::JSON;
 use IO::Socket;
 
@@ -95,12 +95,12 @@ has 'hooks' => (
 	isa => 'HashRef[CodeRef]',
 	default => sub { {} },
 	handles => {
-		set_option => 'set',
-		get_option => 'get',
-		has_no_options => 'is_empty',
-		num_options => 'count',
-		delete_option => 'delete',
-		option_pairs => 'kv'
+		hook_set => 'set',
+		hook_get => 'get',
+		no_hooks => 'is_empty',
+		hook_count => 'count',
+		hook_del => 'delete',
+		hook_list => 'kv'
 	}
 );
 
@@ -113,7 +113,21 @@ sub hook_add {
 	my ($this, $event, $title, $sub) = @_;
 	my $name = $event.'/'.$title;
 	$this->log(HOOK => "Adding new hook: $name");
-	$this->set_option($name, $sub);
+	$this->hook_set($name, $sub);
+}
+
+sub hook_run {
+	my ($this, $event, @args) = @_;
+
+	for my $hook ($this->hook_list)
+	{
+		my $_event = (split '/', $hook->[0])[0];
+
+		if($_event eq $event)
+		{
+			$hook->[1]->(@args);
+		}
+	}
 }
 
 ## config(str)
@@ -225,14 +239,7 @@ sub parse {
 		my $nick = (split '!', $s[0])[0];
 		$nick = substr $nick, 1;
 		my $chan = $s[2];
-		
-		for my $hook ($this->option_pairs)
-		{
-			my $event = (split '/', $hook->[0])[0];
-			next unless $event eq 'JOIN';
-			my $title = (split '/', $hook->[0])[1];
-			$hook->[1]->($chan, $nick);
-		}
+		$this->hook_run(JOIN => $chan, $nick);		
 	}
 	if($s[0] eq 'PING')
 	{
