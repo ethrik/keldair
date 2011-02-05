@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 # Keldair.pm - IRC client library
 # Copyright 2011 Alexandria M. Wolcott <alyx@woomoo.org>
 # Licensed under the 3-clause BSD.
