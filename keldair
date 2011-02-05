@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+# Copyright 2011 Ethrik Project, et al.
+# Licensed under the 3-clause BSD.
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
