@@ -1,14 +1,16 @@
 {
 		"server" : {
 				"address" : "irc.SporksIRC.net",
-				"port" : 6667
-				"usessl" : 0
+				"port" : 6697,
+				"usessl" : 1
 		},
 
 		"keldair" : {
 				"nick" : "Keldair",
 				"ident" : "keldair",
 				"realname" : "Keldair IRC Bot",
-				"log" : "keldair.log"
+				"log" : "keldair.log",
+				"debug" : 1,
+				"home" : "#dev"
 		}
 }
