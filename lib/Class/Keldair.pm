@@ -127,7 +127,7 @@ sub hook_add {
 # @args A list of args to run with the hook - you can send as many arguments as needed after the event str
 sub hook_run {
 	my ($this, $event, @args) = @_;
-
+	$this->log(HOOK => "Running hooks for $event.");
 	for my $hook ($this->hook_list)
 	{
 		my $_event = (split '/', $hook->[0])[0];
@@ -135,6 +135,7 @@ sub hook_run {
 		if($_event eq $event)
 		{
 			$hook->[1]->(@args);
+			$this->log(HOOK => "Ran hook ".$hook->[0].".");
 		}
 	}
 }
@@ -233,7 +234,12 @@ sub parse {
 		my $nick = shift @s;
 		$nick = (split '!', $nick)[0];
 		$nick = substr $nick, 1;
+		my $cmd = shift @s;
 		my $chan = shift @s;
+		my $m = shift @s;
+		$m = substr $m, 1;
+		unshift @s, $m;
+		$this->log(DEBUG => "(PRIVMSG) nick:$nick, chan:$chan, msg:@s");
 		$this->hook_run(PRIVMSG => $chan, $nick, @s);
 	}
 	if($s[0] eq 'PING')
