@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
-
+my $pid = $$;
 BEGIN
 {
 	if(!-e "$Bin/etc/keldair.conf")
@@ -30,3 +30,9 @@ while(my $buffer = <$sock>)
 }
 
 close $sock;
+
+# Kill the first PID we had
+$SIG{CHLD} = sub {
+	print "CHLD - KILLING $pid\n";
+	kill(TERM => $pid);
+}
