@@ -183,7 +183,7 @@ sub connect {
 	}
 	else
 	{
-		$socket = IO::Socket::INET->new(
+		$socket = IO::Socket::IP->new(
 			PeerAddr => $this->server,
 			PeerPort => $this->port,
 			Proto => 'tcp',

@@ -5,6 +5,13 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
+
+BEGIN
+{
+	fork and exit;
+	local $0 = 'keldair';
+}
+
 use Keldair;
 use Keldair::Module::Sample;
 
