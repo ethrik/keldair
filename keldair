@@ -8,6 +8,10 @@ use lib "$Bin/lib";
 
 BEGIN
 {
+	if(!-e "$Bin/etc/keldair.conf")
+	{
+		die "Could not find etc/keldair.conf\n";
+	}
 	fork and exit;
 	local $0 = 'keldair';
 }
