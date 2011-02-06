@@ -1,4 +1,4 @@
-package Test;
+package Keldair::Module::Sample;
 use Keldair;
 
 $keldair->hook_add(JOIN => greet => sub {
