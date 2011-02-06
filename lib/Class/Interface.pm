@@ -20,7 +20,7 @@ has 'commands' => (
 
 ## command_bind(str, code)
 # Bind a command to the interface
-# @cmd Command name as accessed by a user
+# @cmd Command name as accessed by a user - please keep it upper-cased
 # @sub Anonymous subroutine or a reference to a named one - please use anonymous!
 
 ## command_unbind(str)
@@ -29,7 +29,7 @@ has 'commands' => (
 
 ## command_run(str, ...)
 # Run a command with a list of arguments
-# @cmd Command name to run - casing does not matter
+# @cmd Command name to run - casing does matter
 # @args List of arguments to pass to the command
 sub command_run {
 	my ($this, $cmd, @args) = @_;

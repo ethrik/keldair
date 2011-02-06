@@ -39,8 +39,8 @@ $keldair->command_bind(HELP => sub {
 	for my $cmd ($keldair->command_pairs)
 	{
 		push @list, $cmd->[0];
-		$keldair->msg($chan, "@list");
 	}
+	$keldair->msg($chan, "@list");
 });
 
 1;
