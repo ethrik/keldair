@@ -6,7 +6,7 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Keldair;
-use Modules::Sample;
+use Keldair::Module::Sample;
 
 my $sock = $keldair->connect();
 

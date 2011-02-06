@@ -1,14 +1,18 @@
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
+# You are prohibited by law to run this file by perltidy or I will prosecute you -- Samuel Hoffman 2011
 package Class::Keldair;
 use Mouse;
 use Config::JSON;
 use IO::Socket::IP;
-use Keldair::Protocol::Client;
+use Keldair;
+use FindBin qw($Bin);
+
+with 'Class::Commands';
 
 # soemone will probably want to move this to a different location later...
-my $config = Config::JSON->new("$Keldair::Bin/etc/keldair.conf");
-my $socket;
+my $config = Config::JSON->new("$Bin/etc/keldair.conf");
+our $socket;
 
 ## nick(str)
 # Nickname to register with - this may be truncated depending on length limit on server.
@@ -189,28 +193,6 @@ sub connect {
 
 	$this->log(INFO => 'Connected to IRC successfully.');
 	return $socket;
-}
-
-## raw(str)
-# Print a raw line to the socket, ending in a newline (\n)
-# @dat Data to send to the socket - don't end it with \n
-sub raw {
-	my ($this, $dat) = @_;
-	print $socket "$dat\n";
-	print "S: $dat\n" if $this->debug;
-}
-
-## joinChannel(str)
-# Attempt to join a channel
-# @chan Channel to join
-sub joinChannel {
-	my ($this, $chan) = @_;
-	$this->raw("JOIN $chan");
-}
-
-sub msg {
-	my ($this, $target, $msg) = @_;
-	$this->raw("PRIVMSG $target :$msg");
 }
 
 ## parse(str)
