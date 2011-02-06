@@ -150,14 +150,14 @@ sub log {
 
     # this can be expanded to be more intense later
     my ( $this, $level, $msg, $exit ) = @_;
-    open FH, '>>',
-      $this->config('keldair/log')
+    open (my $fh, '>>',
+      $this->config('keldair/log'))
       || die "Could not open "
       . $this->config('keldair/log')
       . " for logging. $!\n";
     my $logtime = localtime;
-    print FH "[$logtime] $level: $msg\n";
-    close FH;
+    print {$fh} "[$logtime] $level: $msg\n";
+    close $fh;
     if ($exit) {
         die "$level: $msg\n";
     }
