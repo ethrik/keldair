@@ -14,13 +14,16 @@ BEGIN
 	}
 	fork and exit;
 	local $0 = 'keldair';
-	open $pidfile, '>',"$Bin/etc/keldair.pid";
+	open (my $pidfile, '>',"$Bin/etc/keldair.pid")
+	  or die("Cannot open pidfile $Bin/etc/keldair.pid");
 	print {$pidfile} $$;
-	close $pidfile;
+	close $pidfile or die("Cannot close pidfile.");
 }
 
 use Keldair;
 use Keldair::Module::Help;
+
+our $VERSION = $Keldair::VERSION;
 
 my $sock = $keldair->connect();
 
@@ -35,22 +38,22 @@ while(my $buffer = <$sock>)
 close $sock;
 
 # Kill the first PID we had
-$SIG{CHLD} = sub {
+local $SIG{CHLD} = sub {
 	print "CHLD - KILLING $pid\n";
 	kill(TERM => $pid);
 };
 
-$SIG{TERM} = sub {
+local $SIG{TERM} = sub {
 	$keldair->raw('QUIT :Caught SIGTERM, exiting.');
 	die "SIGTERM - Exiting\n";
 };
 
-$SIG{INT} = sub {
+local $SIG{INT} = sub {
 	$keldair->raw('QUIT :Caught SIGINT, exiting.');
 	die "SIGINT - Exiting\n";
 };
 
 END
 {
-	unlink 'keldair.pid';
+	unlink "$Bin/etc/keldair.pid";
 }
