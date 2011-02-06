@@ -20,3 +20,4 @@ sub kick {
 	$self->raw("KICK $channel $target :$msg");
 }
 
+1;
