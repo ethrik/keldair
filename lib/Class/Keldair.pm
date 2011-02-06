@@ -3,10 +3,11 @@
 package Class::Keldair;
 use Mouse;
 use Config::JSON;
-use IO::Socket;
+use IO::Socket::IP;
+use Keldair::Protocol::Client;
 
 # soemone will probably want to move this to a different location later...
-my $config = Config::JSON->new('keldair.conf');
+my $config = Config::JSON->new("$Keldair::Bin/etc/keldair.conf");
 my $socket;
 
 ## nick(str)
@@ -178,7 +179,7 @@ sub connect {
         ) || $this->log( WARN => "Could not connect to IRC! $!", 1 );
     }
     else {
-        $socket = IO::Socket::INET->new(
+        $socket = IO::Socket::IP->new(
             PeerAddr => $this->server,
             PeerPort => $this->port,
             Proto    => 'tcp',
@@ -205,11 +206,6 @@ sub raw {
 sub joinChannel {
     my ( $this, $chan ) = @_;
     $this->raw("JOIN $chan");
-}
-
-sub msg {
-    my ( $this, $target, $msg ) = @_;
-    $this->raw("PRIVMSG $target :$msg");
 }
 
 ## parse(str)
