@@ -14,9 +14,9 @@ BEGIN
 	}
 	fork and exit;
 	local $0 = 'keldair';
-	open PID, '>keldair.pid';
-	print PID $$;
-	close PID;
+	open $pidfile, '>',"$Bin/etc/keldair.pid";
+	print {$pidfile} $$;
+	close $pidfile;
 }
 
 use Keldair;
