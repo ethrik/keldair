@@ -14,10 +14,13 @@ BEGIN
 	}
 	fork and exit;
 	local $0 = 'keldair';
+	open PID, '>keldair.pid';
+	print PID $$;
+	close PID;
 }
 
 use Keldair;
-use Keldair::Module::Sample;
+use Keldair::Module::Help;
 
 my $sock = $keldair->connect();
 
@@ -35,4 +38,19 @@ close $sock;
 $SIG{CHLD} = sub {
 	print "CHLD - KILLING $pid\n";
 	kill(TERM => $pid);
+};
+
+$SIG{TERM} = sub {
+	$keldair->raw('QUIT :Caught SIGTERM, exiting.');
+	die "SIGTERM - Exiting\n";
+};
+
+$SIG{INT} = sub {
+	$keldair->raw('QUIT :Caught SIGINT, exiting.');
+	die "SIGINT - Exiting\n";
+};
+
+END
+{
+	unlink 'keldair.pid';
 }

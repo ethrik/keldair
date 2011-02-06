@@ -6,4 +6,9 @@ $keldair->hook_add(JOIN => greet => sub {
 	$keldair->msg($chan, "Hi, $nick!") unless $nick eq $keldair->nick;
 });
 
+$keldair->command_bind(DIE => sub {
+	my ($chan, $nick, @reason) = @_;
+	$keldair->shutdown("($nick) @reason");
+});
+
 1;

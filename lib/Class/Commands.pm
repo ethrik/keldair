@@ -31,4 +31,13 @@ sub msg {
     $this->raw("PRIVMSG $target :$msg");
 }
 
+## quit(str)
+# Quit from IRC with a reason
+# @reason Quit-Reason to use. If not defined, it will default to "leaving"
+sub quit {
+	my ($this, $reason) = @_;
+	$reason ||= "leaving";
+	$this->raw("QUIT :$reason");
+}
+
 1;
