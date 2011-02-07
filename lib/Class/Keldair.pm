@@ -134,7 +134,7 @@ sub hook_run {
 
 		if($_event eq $event)
 		{
-			$hook->[1]->(@args);
+			return $hook->[1]->(@args);
 			$this->log(HOOK => "Ran hook ".$hook->[0]." with these args: @args.");
 		}
 	}

@@ -10,9 +10,14 @@ use Mouse::Role;
 # @chan Channel to join
 sub joinChannel {
 	my ($this, $chan) = @_;
-	$this->hook_run(OnBotPreJoin => $chan);
+	if($this->hook_run(OnBotPreJoin => $chan))
+	{
+		$this->log(HOOK_DENY => "Stopped ".caller." from joining $chan.");
+		return 0;
+	}
 	$this->raw("JOIN $chan");
 	$this->hook_run(OnBotJoin => $chan);
+	return 1;
 }
 
 ## raw(str)
@@ -30,9 +35,14 @@ sub raw {
 # @msg Text to send
 sub msg {
     my ($this, $target, $msg) = @_;
-	$this->hook_run(OnBotPreMessage => $target, $msg);
+	if($this->hook_run(OnBotPreMessage => $target, $msg))
+	{
+		$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target with '$msg'.");
+		return 0;
+	}
     $this->raw("PRIVMSG $target :$msg");
 	$this->hook_run(OnBotMessage => $target, $msg);
+	return 1;
 }
 
 ## quit(str)
@@ -41,9 +51,14 @@ sub msg {
 sub quit {
 	my ($this, $reason) = @_;
 	$reason ||= "leaving";
-	$this->hook_run(OnBotPreQuit => $reason);
+	if($this->hook_run(OnBotPreQuit => $reason))
+	{
+		$this->log(HOOK_DENY => "Stopped ".caller." from QUIT with '$reason'.");
+		return 0;
+	}
 	$this->raw("QUIT :$reason");
 	$this->hook_run(OnBotQuit => $reason);
+	return 1;
 }
 
 1;

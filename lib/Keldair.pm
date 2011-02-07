@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Class::Keldair;
 use base 'Exporter';
-our @EXPORT = qw($keldair);
+our @EXPORT = qw($keldair *HOOK_DENY *HOOK_PASS);
 
 our (%V) = (
     'MAJOR' => 0,
@@ -25,5 +25,8 @@ $keldair->hook_add(OnPreConnect => sub {
 $keldair->hook_add(OnConnect => sub {
 	$keldair->joinChannel($keldair->home);
 });
+
+*HOOK_DENY = 1;
+*HOOK_PASS = 0;
 
 1;

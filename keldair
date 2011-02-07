@@ -48,13 +48,13 @@ local $SIG{CHLD} = sub {
 };
 
 local $SIG{TERM} = sub {
-	$keldair->raw('QUIT :Caught SIGTERM, exiting.');
-	die "SIGTERM - Exiting\n";
+	$keldair->quit('Caught SIGTERM, exiting.');
+	$keldair->log(INFO => 'Caught SIGTERM, exiting.', 1);
 };
 
 local $SIG{INT} = sub {
-	$keldair->raw('QUIT :Caught SIGINT, exiting.');
-	die "SIGINT - Exiting\n";
+	$keldair->quit('Caught SIGINT, exiting.');
+	$keldair->log(INFO => 'Caugt SIGINT, exiting.', 1);
 };
 
 END
