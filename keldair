@@ -23,6 +23,7 @@ BEGIN
 use Keldair;
 use Keldair::Module::Help;
 use Keldair::CoreCommands;
+use Keldair::State;
 
 our $VERSION = $Keldair::VERSION;
 

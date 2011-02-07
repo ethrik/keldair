@@ -11,6 +11,7 @@ $keldair->hook_add(OnMessage => sub {
 
 	my $cmd = substr $msg, length $trigger;
 	$cmd = (split ' ', $cmd)[0];
+	return if !defined $cmd;
 	
 	my $_trigger = substr $msg, 0, (length $trigger);
 

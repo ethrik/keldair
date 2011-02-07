@@ -47,6 +47,16 @@ my (%commands, %_commands);
 	'001' => sub {
 		my ($this, $server, @welcome) = @_;
 		$this->hook_run(OnConnect => $server, @welcome);
+	},
+	'352' => sub {
+		# :slipknot.woomoo.org 352 Keldair #dev sam usr-bin-perl.use-strict.use-warnings slipknot.woomoo.org miniCruzer H*! :0 Only One
+		my ($this, $origin, $numeric, $me, $chan, $ident, $host, $server, $nick, $flags, @real) = @_;
+		my $r = shift @real;
+		$r = substr $r, 1;
+		unshift @real, $r;
+		my $real = join ' ', @real;	
+		
+		$this->hook_run(OnRaw352 => $chan, $ident, $host, $server, $nick, $flags, $real);
 	}
 );
 

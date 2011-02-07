@@ -108,7 +108,36 @@ has 'hooks' => (
 		hook_list => 'kv'
 	}
 );
+## users { }
+# Internal state for the bot, with users as objects
+# Nick => Object
+has 'users' => (
+	traits => ['Hash'],
+	is => 'ro',
+	isa => 'HashRef[Object]',
+	default => sub { {} },
+	handles => {
+		add_user => 'set',
+		find_user => 'get',
+		no_users => 'is_empty',
+		del_user => 'delete',
+		user_pairs => 'kv'
+	}
+);
 
+has 'channels' => (
+	traits => ['Hash'],
+	is => 'ro',
+	isa => 'HashRef[Object]',
+	default => sub { {} },
+	handles => {
+		add_chan => 'set',
+		find_chan => 'get',
+		no_chans => 'is_empty',
+		del_chan => 'delete',
+		chan_pairs => 'kv'
+	}
+);
 ## hook_add(str, str, coderef)
 # Hook to an IRC event
 # @event IRC-Name of event (JOIN, PART, KICK, etc)

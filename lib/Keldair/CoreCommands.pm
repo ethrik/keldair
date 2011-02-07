@@ -18,4 +18,20 @@ $keldair->command_bind(RESTART => sub {
 	$keldair->log(INFO => "Restarting by request of $nick from $chan.", 1);
 });
 
+$keldair->command_bind(EVAL => sub {
+	my ($chan, $nick, @expr) = @_;
+	if(!defined $expr[0])
+	{
+		$keldair->msg($chan, "Syntax: \002EVAL\002 <expression>");
+		return;
+	}
+	
+	my $expr = join ' ', @expr;
+	my $result = eval $expr;
+
+	$keldair->msg($chan, $result) if defined $result;
+	$keldair->msg($chan, $@) if $@;
+	$keldair->msg($chan, 'Done.');
+});
+
 1;
