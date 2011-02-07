@@ -54,8 +54,7 @@ my (%commands, %_commands);
 	PING => sub {
 		my ($this, $cmd, $str) = @_;
 		$this->raw("PONG $str");
-	},
-
+	}
 );
 
 ## parse(str)
