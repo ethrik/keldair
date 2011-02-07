@@ -26,7 +26,9 @@ use Keldair::CoreCommands;
 
 our $VERSION = $Keldair::VERSION;
 
+$keldair->hook_run('OnStart');
 my $sock = $keldair->connect();
+$keldair->hook_run('OnPreConnect');
 
 while(my $buffer = <$sock>)
 {

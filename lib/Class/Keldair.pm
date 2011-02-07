@@ -8,7 +8,7 @@ use IO::Socket::IP;
 use Keldair;
 use FindBin qw($Bin);
 
-with 'Class::Interface', 'Class::Commands';
+with 'Class::Parser', 'Class::Interface', 'Class::Commands';
 
 # soemone will probably want to move this to a different location later...
 my $config = Config::JSON->new("$Bin/etc/keldair.conf");
@@ -115,8 +115,8 @@ has 'hooks' => (
 # @title Unique-Name:Signed-Integer, ex: act:1, act:-3 - determines which will be called first
 # @sub Anonymous Subroutine reference for acting on the hook
 sub hook_add {
-	my ($this, $event, $title, $sub) = @_;
-	my $name = $event.'/'.$title;
+	my ($this, $event, $sub) = @_;
+	my $name = $event.'/'.caller;
 	$this->log(HOOK => "Adding new hook: $name");
 	$this->hook_set($name, $sub);
 }
@@ -135,7 +135,7 @@ sub hook_run {
 		if($_event eq $event)
 		{
 			$hook->[1]->(@args);
-			$this->log(HOOK => "Ran hook ".$hook->[0].".");
+			$this->log(HOOK => "Ran hook ".$hook->[0]." with these args: @args.");
 		}
 	}
 }
@@ -194,58 +194,6 @@ sub connect {
 
 	$this->log(INFO => 'Connected to IRC successfully.');
 	return $socket;
-}
-
-## parse(str)
-# Start parsing an IRC line.
-# @line \n-Terminated line from the server
-my $registered = 0;
-sub parse {
-	my ($this, $line) = @_;
-	# This will simply register connection, handle ping, and join channel for now.
-	
-	$this->log(WARN => 'parse(): Did not get an IRC line when called!', 1) if !$line;
-
-	my @s = split / /, $line;
-	
-	if($s[1] eq 'NOTICE')
-	{
-		return unless $s[2] eq '*';
-		return if $registered;
-		$this->raw('NICK '.$this->nick);
-		$this->raw('USER '.$this->ident.' 8 * :'.$this->realname);
-		$this->log(INFO => 'Registered connection to server.');
-		$registered = 1;
-	}
-	if($s[1] eq '001')
-	{
-		$this->log(INFO => 'Server has accepted my connection, joining the home channel.');
-		$this->joinChannel($this->home);
-	}
-	if($s[1] eq 'JOIN')
-	{
-		my $nick = (split '!', $s[0])[0];
-		$nick = substr $nick, 1;
-		my $chan = $s[2];
-		$this->hook_run(JOIN => $chan, $nick);		
-	}
-	if($s[1] eq 'PRIVMSG')
-	{
-		my $nick = shift @s;
-		$nick = (split '!', $nick)[0];
-		$nick = substr $nick, 1;
-		my $cmd = shift @s;
-		my $chan = shift @s;
-		my $m = shift @s;
-		$m = substr $m, 1;
-		unshift @s, $m;
-		$this->log(DEBUG => "(PRIVMSG) nick:$nick, chan:$chan, msg:@s");
-		$this->hook_run(PRIVMSG => $chan, $nick, @s);
-	}
-	if($s[0] eq 'PING')
-	{
-		$this->raw("PONG $s[1]");
-	}
 }
 
 1;

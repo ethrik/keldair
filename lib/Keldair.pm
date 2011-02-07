@@ -17,4 +17,13 @@ our (%V) = (
 our $VERSION = "$V{MAJOR}.$V{MINOR}.$V{PATCH}";
 our $keldair = Class::Keldair->new();
 
+$keldair->hook_add(OnPreConnect => sub {
+	$keldair->raw("NICK ".$keldair->nick);
+	$keldair->raw("USER ".$keldair->ident." 8 * :".$keldair->realname);
+});
+
+$keldair->hook_add(OnConnect => sub {
+	$keldair->joinChannel($keldair->home);
+});
+
 1;

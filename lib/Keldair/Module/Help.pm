@@ -3,12 +3,11 @@ use Keldair;
 use strict;
 use warnings;
 
-$keldair->hook_add(PRIVMSG => cmd => sub {
+$keldair->hook_add(OnMessage => sub {
 	my ($chan, $nick, @msg) = @_;
-
+	
 	my $trigger = $keldair->config('keldair/trigger');
 	my $msg = join ' ', @msg;
-
 
 	my $cmd = substr $msg, length $trigger;
 	$cmd = (split ' ', $cmd)[0];
