@@ -10,7 +10,9 @@ use Mouse::Role;
 # @chan Channel to join
 sub joinChannel {
 	my ($this, $chan) = @_;
+	$this->hook_run(OnBotPreJoin => $chan);
 	$this->raw("JOIN $chan");
+	$this->hook_run(OnBotJoin => $chan);
 }
 
 ## raw(str)
@@ -27,8 +29,10 @@ sub raw {
 # @target Channel or User to message
 # @msg Text to send
 sub msg {
-    my ($this, $target, $msg) = @_; 
+    my ($this, $target, $msg) = @_;
+	$this->hook_run(OnBotPreMessage => $target, $msg);
     $this->raw("PRIVMSG $target :$msg");
+	$this->hook_run(OnBotMessage => $target, $msg);
 }
 
 ## quit(str)
@@ -37,7 +41,9 @@ sub msg {
 sub quit {
 	my ($this, $reason) = @_;
 	$reason ||= "leaving";
+	$this->hook_run(OnBotPreQuit => $reason);
 	$this->raw("QUIT :$reason");
+	$this->hook_run(OnBotQuit => $reason);
 }
 
 1;

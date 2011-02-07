@@ -39,6 +39,7 @@ while(my $buffer = <$sock>)
 }
 
 close $sock;
+$keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
 local $SIG{CHLD} = sub {
@@ -58,5 +59,6 @@ local $SIG{INT} = sub {
 
 END
 {
+	$keldair->hook_run('OnEnd');
 	unlink "$Bin/etc/keldair.pid";
 }
