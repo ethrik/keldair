@@ -62,4 +62,5 @@ END
 {
 	$keldair->hook_run('OnEnd');
 	unlink "$Bin/etc/keldair.pid";
+	$keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
 }
