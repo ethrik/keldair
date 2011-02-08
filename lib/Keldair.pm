@@ -5,6 +5,7 @@ package Keldair;
 use strict;
 use warnings;
 use Class::Keldair;
+use Sys::Hostname;
 use base 'Exporter';
 our @EXPORT = qw($keldair *HOOK_DENY *HOOK_PASS);
 
@@ -18,8 +19,9 @@ our $VERSION = "$V{MAJOR}.$V{MINOR}.$V{PATCH}";
 our $keldair = Class::Keldair->new();
 
 $keldair->hook_add(OnPreConnect => sub {
+	$keldair->raw("PASS ".$keldair->config('server/password')) if $keldair->config('server/password');
 	$keldair->raw("NICK ".$keldair->nick);
-	$keldair->raw("USER ".$keldair->ident." 8 * :".$keldair->realname);
+	$keldair->raw("USER ".$keldair->ident.' '.hostname.' '.$keldair->config('server/address')." :".$keldair->realname);
 });
 
 $keldair->hook_add(OnConnect => sub {
