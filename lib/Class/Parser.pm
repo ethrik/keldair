@@ -1,5 +1,7 @@
 package Class::Parser;
 use Mouse::Role;
+use strict;
+use warnings;
 
 my (%commands, %_commands);
 
@@ -44,6 +46,21 @@ my (%commands, %_commands);
 		my $nick = nick_from_host($origin);
 		$this->hook_run(OnJoin => $nick, $chan);
 	},
+	PART => sub {
+		my ($this, $origin, $cmd, $chan) = @_;
+		my $nick = nick_from_host($origin);
+		$this->hook_run(OnPart => $nick, $chan);
+	},
+	KICK => sub {
+		my ($this, $origin, $cmd, $chan, $target, @reason) = @_;
+		my $nick = nick_form_host($origin);
+		$this->hook_run(OnKick => $nick, $chan, $target, (join ' ', @reason));
+	},
+	MODE => sub {
+		my ($this, $origin, $cmd, $target, $modemask, @args) = @_;
+		my $nick = nick_from_host($origin);
+		$this->hook_run(OnMode => $nick, $target, $modemask, @args);
+	},
 	'001' => sub {
 		my ($this, $server, @welcome) = @_;
 		$this->hook_run(OnConnect => $server, @welcome);
@@ -87,7 +104,8 @@ sub parse {
 
 sub nick_from_host {
 	my ($host) = @_;
-	my $nick = (split /!/, $host, 1)[0];
+	my $nick = (split /!/, $host)[0];
+	$nick = substr $nick, 1;
 	return $nick if $nick;
 }
 
