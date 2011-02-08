@@ -25,6 +25,7 @@ $keldair->hook_add(OnRaw352 => sub {
 		);
 
 		$keldair->add_user($nick, $user); # will be over-written if it already exists so no reason to check before adding
+		$user->add_chan($chan, $keldair->find_chan($chan));
 		$keldair->find_chan($chan)->add_user($nick, $user);
 	}
 );
