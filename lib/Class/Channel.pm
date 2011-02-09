@@ -14,7 +14,7 @@ has 'topic' => (
 
 has 'users' => (
 	traits => ['Hash'],
-	is => 'rw',
+	is => 'ro',
 	isa => 'HashRef[Object]',
 	default => sub { {} },
 	handles => {
@@ -23,6 +23,27 @@ has 'users' => (
 		no_users => 'is_empty',
 		del_user => 'delete',
 		user_pairs => 'kv'
+	}
+);
+
+### modes(modechar, RPL)
+## add_mode(char, RPL)
+# Add's the mode to the channel, and its RPL description
+## has_mode(char)
+# @return RPL for the char if it is set
+## del_mode(char)
+# Delete the mode character from the channel
+has 'modes' => (
+	traits => ['Hash'],
+	is => 'ro',
+	isa => 'HashRef[Str]',
+	default => sub { {} },
+	handles => {
+		add_mode => 'set',
+		has_mode => 'get',
+		no_modes => 'is_empty',
+		del_mode => 'delete',
+		mode_pairs => 'kv'
 	}
 );
 

@@ -45,5 +45,18 @@ has 'channels' => (
         }
 );
 
+has 'modes' => (
+	traits => ['Hash'],
+	is => 'ro',
+	isa => 'HashRef[Str]',
+	default => sub { {} },
+	handles => {
+		add_mode => 'set',
+		has_mode => 'get',
+		del_mode => 'delete',
+		no_modes => 'is_empty',
+		mdoe_paris => 'kv'
+	}
+);
 
 1;

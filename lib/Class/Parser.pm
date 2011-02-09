@@ -59,6 +59,48 @@ my (%commands, %_commands);
 	MODE => sub {
 		my ($this, $origin, $cmd, $target, $modemask, @args) = @_;
 		my $nick = nick_from_host($origin);
+
+		my (@chars, @adding, @removing, $set);
+
+		@chars = split //, $modemask;
+
+		foreach (@chars)
+		{
+			if($_ eq '+')
+			{
+				$set = '+';
+				next;
+			}
+			elsif($_ eq '-')
+			{
+				$set = '-';
+				next;
+			}
+			else
+			{
+				push @adding, $_ if $set eq '+';
+				push @removing, $_ if $set eq '-';
+			}
+		}
+
+		if($target =~ m/^\#/)
+		{
+			$this->find_chan($target)->add_mode($_, 'TODO') foreach (@adding);
+			$this->find_chan($target)->del_mode($_, 'TODO') foreach (@removing);
+		}
+		else
+		{
+			my $user = $this->find_user($target);
+			if($user)
+			{
+				$user->add_mode($_, 'TODO') foreach (@adding);
+				$user->del_mode($_, 'TODO') foreach (@removing);
+			}
+			else
+			{
+				$this->log(PARSER => "Could not find user $target - not an object!");
+			}
+		}
 		$this->hook_run(OnMode => $nick, $target, $modemask, @args);
 	},
 	'001' => sub {

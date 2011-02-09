@@ -214,6 +214,7 @@ sub log {
 # @return Returns socket object indicating that the connection was successful.
 sub connect {
 	my ($this) = @_;
+	
 	if($this->usessl)
 	{
 		require IO::Socket::SSL;
