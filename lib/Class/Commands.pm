@@ -10,7 +10,7 @@ use Mouse::Role;
 # @chan Channel to join
 sub joinChannel {
 	my ($this, $chan) = @_;
-	if($this->hook_run(OnBotPreJoin => $chan))
+	if($this->hook_run(OnBotPreJoin => $chan) < 0)
 	{
 		$this->log(HOOK_DENY => "Stopped ".caller." from joining $chan.");
 		return 0;

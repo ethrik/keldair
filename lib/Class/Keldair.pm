@@ -138,6 +138,7 @@ has 'channels' => (
 		chan_pairs => 'kv'
 	}
 );
+
 ## hook_add(str, str, coderef)
 # Hook to an IRC event
 # @event IRC-Name of event (JOIN, PART, KICK, etc)
@@ -163,8 +164,20 @@ sub hook_run {
 
 		if($_event eq $event)
 		{
-			return $hook->[1]->(@args);
+			my $res = $hook->[1]->(@args);
+			
+			if($res == -2)
+			{
+				$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event.");
+				return $res;
+			}
+			elsif($res == 1)
+			{
+				$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event.");
+				return $res;
+			}
 			$this->log(HOOK => "Ran hook ".$hook->[0]." with these args: @args.");
+			return $res unless !defined $res;
 		}
 	}
 }
