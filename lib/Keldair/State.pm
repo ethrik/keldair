@@ -5,6 +5,8 @@ use Keldair;
 use Class::Channel;
 use Class::User;
 
+my %isupport;
+
 $keldair->hook_add(OnJoin => sub {
 	my ($nick, $chan) = @_;
 	$keldair->raw("WHO $chan");
@@ -45,5 +47,27 @@ $keldair->hook_add(OnPart => sub {
 $keldair->hook_add(OnMode => sub {
 	
 });
+
+$keldair->hook_add(OnRaw005 => sub {
+	my $support = shift;
+
+	my @info = split ' ', $support;
+
+	foreach (@info)
+	{
+		if($_ =~ m/=/)
+		{
+			my ($key, $value) = split '=', $_;
+			$isupport{$key} = $value;
+			$keldair->log(ISUPPORT => "$key => $value");
+		}
+		elsif($_ =~ m/^[A-Z]+$/)
+		{
+			$isupport{$_} = 'ON';
+			$keldair->log(ISUPPORT => "$_ is on.");
+		}
+	}
+});
+
 
 1;
