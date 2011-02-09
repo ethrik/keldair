@@ -4,9 +4,9 @@ use warnings;
 use Keldair;
 
 $keldair->command_bind(DIE => sub {
-	my ($chan, $nick, $reason) = @_;
+	my ($chan, $nick, @reason) = @_;
 
-	$keldair->quit($reason);
+	$keldair->quit((join ' ', @reason));
 	$keldair->log(INFO => "Shutting down by request of $nick from $chan.", 1);
 });
 
