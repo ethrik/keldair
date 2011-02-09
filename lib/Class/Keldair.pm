@@ -221,7 +221,11 @@ sub connect {
 			PeerAddr => $this->server,
 			PeerPort => $this->port,
 			Proto => 'tcp',
-			Timeout => 30
+			Timeout => 30,
+			SSL_use_cert => 1,
+			SSL_key_file => $config->get('keldair/key'),
+			SSL_cert_file => $config->get('keldair/cert'),
+			SSL_passwd_cb =>  sub { return $config->get('keldair/key_passwd') }
 		) || $this->log(WARN => "Could not connect to IRC! $!", 1);
 	}
 	else
