@@ -166,12 +166,12 @@ sub hook_run {
 		{
 			my $res = $hook->[1]->(@args);
 			
-			if($res == -2)
+			if($res && $res == -2)
 			{
 				$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event.");
 				return $res;
 			}
-			elsif($res == 1)
+			elsif($res && $res == 1)
 			{
 				$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event.");
 				return $res;

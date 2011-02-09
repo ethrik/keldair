@@ -74,6 +74,12 @@ my (%commands, %_commands);
 		my $real = join ' ', @real;	
 		
 		$this->hook_run(OnRaw352 => $chan, $ident, $host, $server, $nick, $flags, $real);
+	},
+	'005' => sub {
+		my ($this, $origin, $num, $me, @support) = @_;
+		my $support = join ' ', @support;
+		
+		$this->hook_run(OnRaw005 => $support);
 	}
 );
 
