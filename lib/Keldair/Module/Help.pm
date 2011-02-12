@@ -7,10 +7,18 @@ use Keldair;
 use strict;
 use warnings;
 
+my $trigger;
+
+$keldair->hook_add(OnRehash => sub {
+	my $chan = shift;
+	$trigger = $keldair->config('keldair/trigger');
+	$keldair->msg($chan => "Updating trigger to '$trigger'.") unless !$chan;
+	return 0;
+});
+
 $keldair->hook_add(OnMessage => sub {
 	my ($chan, $nick, @msg) = @_;
 	
-	my $trigger = $keldair->config('keldair/trigger');
 	my $msg = join ' ', @msg;
 
 	my $cmd = substr $msg, length $trigger;

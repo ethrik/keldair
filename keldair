@@ -28,6 +28,7 @@ use Keldair::State;
 our $VERSION = $Keldair::VERSION;
 
 $keldair->hook_run('OnStart');
+$keldair->hook_run('OnRehash');
 my $sock = $keldair->connect();
 $keldair->hook_run('OnPreConnect');
 

@@ -81,6 +81,7 @@ my (%commands, %_commands);
 			}
 			else
 			{
+				return if !defined $set;
 				push @adding, $_ if $set eq '+';
 				push @removing, $_ if $set eq '-';
 			}

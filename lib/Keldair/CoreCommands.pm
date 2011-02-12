@@ -41,6 +41,7 @@ $keldair->command_bind(REHASH => sub {
 	my ($chan, $nick) = @_;
 
 	$keldair->hook_run(OnRehash => $chan, $nick);
+	$keldair->msg($chan, 'Rehashing keldair.conf.');
 	$keldair->log(INFO => "$nick is rehashing keldair.conf.")
 });
 
