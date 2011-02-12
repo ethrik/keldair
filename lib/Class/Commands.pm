@@ -10,13 +10,13 @@ use Mouse::Role;
 # @chan Channel to join
 sub joinChannel {
 	my ($this, $chan) = @_;
-	if($this->hook_run(OnBotPreJoin => $chan) < 0)
+	if($this->hook_run(OnBotPreJoin => $this->find_chan($chan)) < 0)
 	{
 		$this->log(HOOK_DENY => "Stopped ".caller." from joining $chan.");
 		return 0;
 	}
 	$this->raw("JOIN $chan");
-	$this->hook_run(OnBotJoin => $chan);
+	$this->hook_run(OnBotJoin => $this->find_chan($chan));
 	return 1;
 }
 
@@ -40,7 +40,18 @@ sub msg {
 		$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target with '$msg'.");
 		return 0;
 	}
-    $this->raw("PRIVMSG $target :$msg");
+	if($target->isa('channel'))
+	{
+    	$this->raw("PRIVMSG ".$target->name." :$msg");
+	}
+	elsif($this->isa('user'))
+	{
+		$this->raw("PRIVMSG ".$target->nick." :$msg");
+	}
+	else
+	{
+		$this->raw("PRIVMSG $target :$msg");
+	}
 	$this->hook_run(OnBotMessage => $target, $msg);
 	return 1;
 }

@@ -9,12 +9,20 @@ use warnings;
 
 $keldair->hook_add(OnJoin => sub {
 	my ($chan, $nick) = @_;
-	$keldair->msg($chan, "Hi, $nick!") unless $nick eq $keldair->nick;
+	#$keldair->msg($chan, "Hi, $nick!") unless $nick eq $keldair->nick;
 });
 
 $keldair->hook_add(OnBotPreJoin => sub {
 	my ($chan) = @_;
 	return *HOOK_DENY if $chan eq '#dev';
+});
+
+$keldair->schedule(sub {
+	for my $chan ($keldair->channel_pairs())
+	{
+		$keldair->msg($chan->[1], 'Yay, 60s timer works!');
+		return 1;
+	}
 });
 
 1;

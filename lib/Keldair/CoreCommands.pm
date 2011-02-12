@@ -7,7 +7,10 @@ use warnings;
 use Keldair;
 
 $keldair->command_bind(DIE => sub {
-	my ($chan, $nick, @reason) = @_;
+	my ($chan_p, $nick_p, @reason) = @_;
+
+	my $nick = $nick_p->nick;
+	my $chan = $chan_p->name;
 
 	$keldair->quit((join ' ', @reason));
 	$keldair->log(INFO => "Shutting down by request of $nick from $chan.", 1);

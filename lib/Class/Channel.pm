@@ -50,4 +50,11 @@ has 'modes' => (
 	}
 );
 
+## isa(str)
+# @isa If this variable equals 'channel', it will return 1
+sub isa {
+	my ($this, $isa) = @_;
+	return 1 if(lc($isa) eq 'channel');
+}
+
 1;

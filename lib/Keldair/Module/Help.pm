@@ -36,7 +36,7 @@ $keldair->hook_add(OnMessage => sub {
 	my $exec_cmd = $keldair->command_get(uc $cmd);
 	if($exec_cmd)
 	{
-		$exec_cmd->($chan, $nick, @args);
+		$exec_cmd->($keldair->find_chan($chan), $keldair->find_user($nick), @args);
 	}
 	else
 	{

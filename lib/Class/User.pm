@@ -62,4 +62,11 @@ has 'modes' => (
 	}
 );
 
+## isa(str)
+# @isa If this equals 'user', it will return 1
+sub isa {
+	my ($this, $isa) = @_;
+	return 1 if $isa eq 'user';
+}
+
 1;
