@@ -1,3 +1,6 @@
+# Copyright 2011 Ethrik Project, et al.
+# Licensed under the 3-clause BSD.
+# You are prohibited by law to run this file by perltidy or I will prosecute you -- Samuel Hoffman 2011
 package Keldair::CoreCommands;
 use strict;
 use warnings;
@@ -32,6 +35,13 @@ $keldair->command_bind(EVAL => sub {
 	$keldair->msg($chan, $result) if defined $result;
 	$keldair->msg($chan, $@) if $@;
 	$keldair->msg($chan, 'Done.');
+});
+
+$keldair->command_bind(REHASH => sub {
+	my ($chan, $nick) = @_;
+
+	$keldair->hook_run(OnRehash => $chan, $nick);
+	$keldair->log(INFO => "$nick is rehashing keldair.conf.")
 });
 
 1;

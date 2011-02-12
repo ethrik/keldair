@@ -1,3 +1,7 @@
+# Copyright 2011 Ethrik Project, et al.
+# Licensed under the 3-clause BSD.
+# You are prohibited by law to run this file by perltidy or I will prosecute you -- Samuel Hoffman 2011
+
 package Keldair::Module::Help;
 use Keldair;
 use strict;
@@ -11,11 +15,11 @@ $keldair->hook_add(OnMessage => sub {
 
 	my $cmd = substr $msg, length $trigger;
 	$cmd = (split ' ', $cmd)[0];
-	return if !defined $cmd;
+	return 0 if !defined $cmd;
 	
 	my $_trigger = substr $msg, 0, (length $trigger);
 
-	return unless $trigger eq $_trigger;
+	return 0 unless $trigger eq $_trigger;
 
 	my $trig_and_cmd = length($cmd) + length($trigger);
 	my $args = substr $msg, $trig_and_cmd;
