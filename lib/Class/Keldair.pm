@@ -109,7 +109,7 @@ has 'hooks' => (
 	}
 );
 ## users { }
-# Internal state for the bot, with users as objects
+# Internal user state for the bot, with users as objects
 # Nick => Object
 has 'users' => (
 	traits => ['Hash'],
@@ -124,7 +124,9 @@ has 'users' => (
 		user_pairs => 'kv'
 	}
 );
-
+## channels { }
+# Internal channel sate for the bot
+# Channel => Object
 has 'channels' => (
 	traits => ['Hash'],
 	is => 'ro',
@@ -165,19 +167,22 @@ sub hook_run {
 		if($_event eq $event)
 		{
 			my $res = $hook->[1]->(@args);
-			
-			if($res && $res == -2)
+		
+			if(defined $res)
 			{
-				$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event.");
+				if($res == -2)
+				{
+					$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event (return -2).");
+					return $res;
+				}
+				elsif($res == -1)
+				{
+					$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event (return 1).");
+					return $res;
+				}
 				return $res;
 			}
-			elsif($res && $res == 1)
-			{
-				$this->log(HOOK_EATEN => $hook->[0]." has eaten event $event.");
-				return $res;
-			}
-			$this->log(HOOK => "Ran hook ".$hook->[0]." with these args: @args.");
-			return $res unless !defined $res;
+			$this->log(HOOK => "Ran hook ".$hook->[0].".");
 		}
 	}
 }
@@ -207,6 +212,23 @@ sub log {
 	{
 		die "$level: $msg\n";
 	}
+}
+
+## logf(str, str, ...)
+# Print to the logfile in an sprintf-style
+# @level Type of log notice - can be anything
+# @msg Message to print to the log - can contain %s/%u/%d/etc.
+# @... Values to fill for any % variables used in $msg 
+sub logf {
+	my $this = shift;
+	my $level = shift;
+
+	my $msg = sprintf shift @_, @_;
+
+	open FH, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
+	my $logtime = localtime;
+	print FH "[$logtime] $level: $msg\n";
+	close FH;
 }
 
 ## connect()

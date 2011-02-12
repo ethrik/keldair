@@ -28,12 +28,28 @@ $keldair->hook_add(OnConnect => sub {
 	$keldair->joinChannel($keldair->home);
 });
 
-*HOOK_PASS = 0; # Allow action to proceed.
-*HOOK_DENY = -1; # Do not allow action to proceed.
-*HOOK_DENY_EAT = -2; # Do not allow action to proceed, and stop all other hooks from being run.
-*HOOK_PASS_EAT = 1; # Allow action to proceed, and stop all other hooks from being run.
+$SIG{__WARN__} = sub {
+	for my $warn (@_)
+	{
+		$keldair->log(ERROR => $warn);
+		print $warn;
+	}
+};
 
-# < 0  : Deny always
-# => 0 : Pass always
+$SIG{__DIE__} = sub {
+	for my $die (@_)
+	{
+		$keldair->log(ERROR => $die);
+		print $die;
+	}
+};
+
+*HOOK_PASS = 1; 		# Allow action to proceed.
+*HOOK_DENY = 2; 		# Do not allow action to proceed.
+*HOOK_DENY_EAT = -2;	# Do not allow action to proceed, and eat event.
+*HOOK_PASS_EAT = -1;	# Allow action to proceed, and eat event.
+
+# DENY = 1/-1
+# PASS = 2/-1
 
 1;

@@ -1,3 +1,6 @@
+# Copyright 2011 Ethrik Project, et al.
+# Licensed under the 3-clause BSD.
+# You are prohibited by law to run this file by perltidy or I will prosecute you -- Samuel Hoffman 2011
 package Class::Parser;
 use Mouse::Role;
 use strict;
@@ -53,7 +56,7 @@ my (%commands, %_commands);
 	},
 	KICK => sub {
 		my ($this, $origin, $cmd, $chan, $target, @reason) = @_;
-		my $nick = nick_form_host($origin);
+		my $nick = nick_from_host($origin);
 		$this->hook_run(OnKick => $nick, $chan, $target, (join ' ', @reason));
 	},
 	MODE => sub {
@@ -78,6 +81,7 @@ my (%commands, %_commands);
 			}
 			else
 			{
+				return if !defined $set;
 				push @adding, $_ if $set eq '+';
 				push @removing, $_ if $set eq '-';
 			}

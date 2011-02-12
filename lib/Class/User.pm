@@ -1,3 +1,6 @@
+# Copyright 2011 Ethrik Project, et al.
+# Licensed under the 3-clause BSD.
+# You are prohibited by law to run this file by perltidy or I will prosecute you -- Samuel Hoffman 2011
 package Class::User;
 use Mouse;
 
@@ -58,5 +61,12 @@ has 'modes' => (
 		mdoe_paris => 'kv'
 	}
 );
+
+## isa(str)
+# @isa If this equals 'user', it will return 1
+sub isa {
+	my ($this, $isa) = @_;
+	return 1 if $isa eq 'user';
+}
 
 1;

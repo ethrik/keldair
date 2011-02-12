@@ -1,3 +1,6 @@
+# Copyright 2011 Ethrik Project, et al.
+# Licensed under the 3-clause BSD.
+# You are prohibited by law to run this file by perltidy or I will prosecute you -- Samuel Hoffman 2011
 package Class::Channel;
 use Mouse;
 
@@ -46,5 +49,12 @@ has 'modes' => (
 		mode_pairs => 'kv'
 	}
 );
+
+## isa(str)
+# @isa If this variable equals 'channel', it will return 1
+sub isa {
+	my ($this, $isa) = @_;
+	return 1 if(lc($isa) eq 'channel');
+}
 
 1;
