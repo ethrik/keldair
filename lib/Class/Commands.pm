@@ -45,16 +45,21 @@ sub raw {
 sub msg {
 	my $this = shift;
 	my $target = shift;
-	my $msg = sprintf(shift(@_), @_);
-
-	if($this->hook_run(OnBotPreMessage => $target, $msg))
+	my $msg = sprintf(shift @_, @_);
+	
+	my $res = $this->hook_run(OnBotPreMessage => $target, $msg);
+	
+	if($res)
 	{
-		$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target with '$msg'.");
-		return 0;
+		if($res == 2 || $res == -2)
+		{
+			$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target with '$msg'.");
+			return $res;
+		}
 	}
 	if($target->isa('channel'))
 	{
-    	$this->raw("PRIVMSG ".$target->name." :$msg");
+  	 	$this->raw("PRIVMSG ".$target->name." :$msg");
 	}
 	elsif($this->isa('user'))
 	{
@@ -62,10 +67,44 @@ sub msg {
 	}
 	else
 	{
-		$this->raw("PRIVMSG $target :$msg");
+		$this->log(ERROR => "msg(): Recieved invalid target ($target) - neither channel or user.");
+		return $res;
 	}
 	$this->hook_run(OnBotMessage => $target, $msg);
-	return 1;
+	return $res if $res;
+}
+
+sub notice {
+	my $this = shift;
+	my $target = shift;
+	my $msg = sprintf(shift @_, @_);
+
+	my $res = $this->hook_run(OnBotPreNotice => $target, $msg);
+	
+	if($res)
+	{
+		if($res == 2 || $res == -2)
+		{
+			my $class = caller;
+			$this->log(HOOK_DENY => "Stopped $class from sending NOTICE to $target with '$msg'.");
+			return $res;
+		}
+	}
+	if($target->isa('channel'))
+	{
+		$this->raw('NOTICE '.$target->name." :$msg");
+	}
+	elsif($target->isa('user'))
+	{
+		$this->raw('NOTICE '.$target->nick." :$msg");
+	}
+	else
+	{
+		$this->log(ERROR => "notice(): Recieved invalid target ($target) - neither channel or user.");
+		return $res;
+	}
+	$this->hook_run(OnBotNotice => $target, $msg);
+	return $res if $res
 }
 
 ## quit(str)
