@@ -204,10 +204,10 @@ sub config {
 sub log {
 	# this can be expanded to be more intense later
 	my ($this, $level, $msg, $exit) = @_;
-	open FH, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
+	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
 	my $logtime = localtime;
-	print FH "[$logtime] $level: $msg\n";
-	close FH;
+	print {$fh} "[$logtime] $level: $msg\n";
+	close $fh;
 	if($exit)
 	{
 		die "$level: $msg\n";
@@ -225,10 +225,10 @@ sub logf {
 
 	my $msg = sprintf shift @_, @_;
 
-	open FH, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
+	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
 	my $logtime = localtime;
-	print FH "[$logtime] $level: $msg\n";
-	close FH;
+	print {$fh} "[$logtime] $level: $msg\n";
+	close $fh;
 }
 
 ## connect()
