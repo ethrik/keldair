@@ -8,7 +8,7 @@ use IO::Socket::IP;
 use Keldair;
 use FindBin qw($Bin);
 
-with 'Class::Schedule', 'Class::Parser', 'Class::Interface', 'Class::Commands';
+with 'Class::Parser', 'Class::Interface', 'Class::Commands';
 
 # soemone will probably want to move this to a different location later...
 my $config = Config::JSON->new("$Bin/etc/keldair.conf");
