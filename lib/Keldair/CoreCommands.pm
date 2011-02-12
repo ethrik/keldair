@@ -7,9 +7,9 @@ use warnings;
 use Keldair;
 
 $keldair->command_bind(DIE => sub {
-	my ($chan_p, $nick_p, @reason) = @_;
+	my ($chan_p, $dst, @reason) = @_;
 
-	my $nick = $nick_p->nick;
+	my $nick = $dst->nick;
 	my $chan = $chan_p->name;
 
 	$keldair->quit((join ' ', @reason));
@@ -17,7 +17,10 @@ $keldair->command_bind(DIE => sub {
 });
 
 $keldair->command_bind(RESTART => sub {
-	my ($chan, $nick, $reason) = @_;
+	my ($chan_p, $dst, $reason) = @_;
+
+	my $nick = $dst->nick;
+	my $chan = $chan_p->name;
 
 	system 'perl keldair';
 	$keldair->quit($reason);
@@ -25,7 +28,7 @@ $keldair->command_bind(RESTART => sub {
 });
 
 $keldair->command_bind(EVAL => sub {
-	my ($chan, $nick, @expr) = @_;
+	my ($chan, $dst, @expr) = @_;
 	if(!defined $expr[0])
 	{
 		$keldair->msg($chan, "Syntax: \002EVAL\002 <expression>");
@@ -41,11 +44,16 @@ $keldair->command_bind(EVAL => sub {
 });
 
 $keldair->command_bind(REHASH => sub {
-	my ($chan, $nick) = @_;
+	my ($chan, $dst) = @_;
 
-	$keldair->hook_run(OnRehash => $chan, $nick);
+	$keldair->hook_run(OnRehash => $chan, $dst);
 	$keldair->msg($chan, 'Rehashing keldair.conf.');
-	$keldair->log(INFO => "$nick is rehashing keldair.conf.")
+	$keldair->log(INFO => $dst->nick.' is rehashing keldair.conf.')
+});
+
+$keldair->command_bind(PING => sub {
+	my ($chan, $dst) = @_;
+	$keldair->msg($chan, '%s: Pong!', $dst->nick);
 });
 
 1;

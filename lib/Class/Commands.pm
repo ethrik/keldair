@@ -24,7 +24,16 @@ sub joinChannel {
 # Send a raw line to the server
 # @dat Data to send to the server
 sub raw {
-    my ($this, $dat) = @_; 
+    my ($this, $dat) = @_;
+	my $res = $this->hook_run(OnBotPreRaw => $Class::Keldair::socket, $dat);
+	if ($res)
+	{
+		if($res == 2 || $res == -2)
+		{
+			$this->log(HOOK_DENY => caller.' denied OnBotPreRaw.');
+			return $res;
+		}
+	}
     print $Class::Keldair::socket "$dat\n";
     print "S: $dat\n" if $this->debug;
 }
@@ -34,7 +43,10 @@ sub raw {
 # @target Channel or User to message
 # @msg Text to send
 sub msg {
-    my ($this, $target, $msg) = @_;
+	my $this = shift;
+	my $target = shift;
+	my $msg = sprintf(shift(@_), @_);
+
 	if($this->hook_run(OnBotPreMessage => $target, $msg))
 	{
 		$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target with '$msg'.");

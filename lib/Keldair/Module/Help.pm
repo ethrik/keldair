@@ -12,7 +12,7 @@ my $trigger;
 $keldair->hook_add(OnRehash => sub {
 	my $chan = shift;
 	$trigger = $keldair->config('keldair/trigger');
-	$keldair->msg($chan => "Updating trigger to '$trigger'.") unless !$chan;
+	$keldair->msg($chan => 'Updating trigger to %s', $trigger) unless !$chan;
 	return 0;
 });
 
@@ -40,7 +40,7 @@ $keldair->hook_add(OnMessage => sub {
 	}
 	else
 	{
-		$keldair->msg($chan, (uc $cmd).": No such command.");
+		$keldair->msg($chan => "%s: No such command.", uc $cmd);
 	}
 });
 
