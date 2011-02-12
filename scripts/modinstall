@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use Getopt::Long;
+use Furl;
+
+our $VERSION = '0.1.0';
+
+GetOptions( 'i=s' => \my $option_i, 'v' => \my $option_v, 'h' => \my $option_h ) or exit(1);
+
+if ($option_v) { print <<ENDVER;
+
+modinstall (Keldair utility) $VERSION
+Copyright (c) 2011 Ethrik Project
+License: 3-Clause BSD.
+
+ENDVER
+exit(1);
+}
+
+if ($option_h) { print <<ENDHELP;
+
+Usage: $0 -[v|h|i [argument]]
+   -v	Returns the modmanage version.
+   -h	Returns this help message.
+   -i	Installs the Keldair module specified in the argument.
+
+ENDHELP
+exit(1);
+}
+
+if ($option_i) {
+	my ($location,$module) = split('/',$option_i);
+	my $furl = Furl->new(
+		agent => "KeldairModinstall/$VERSION",
+		timeout => 10
+	);
+
+	my $res = $furl->get("https://github.com/ethrik/kmods/raw/master/$location/$module.pm");
+	die $res->status_line unless $res->is_success;
+	open(my $fh, '>', "$Bin/../lib/Keldair/Module/$module")
+	  or die("Cannot open file: $!");
+	print {$fh} $res->content;
+	close($fh) or die("Cannot close file: $!");
+	open(my $fh, '<', "$Bin/../lib/Keldair/Module/$module");
+	while (my $line = <$fh>) {
+		if ($line =~ /# modreq: (.*)/i) {
+			my @mods = split(',',$1);
+			print("$module requires the following modules to be installed from CPAN: ".join(' ',@mods)."\n");
+		}
+		if ($line =~ /# modconf: (.*)/i) {
+			my $modconf = $1;
+		}
+	}
+}
+
+
+
