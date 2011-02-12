@@ -214,6 +214,23 @@ sub log {
 	}
 }
 
+## logf(str, str, ...)
+# Print to the logfile in an sprintf-style
+# @level Type of log notice - can be anything
+# @msg Message to print to the log - can contain %s/%u/%d/etc.
+# @... Values to fill for any % variables used in $msg 
+sub logf {
+	my $this = shift;
+	my $level = shift;
+
+	my $msg = sprintf shift @_, @_;
+
+	open FH, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
+	my $logtime = localtime;
+	print FH "[$logtime] $level: $msg\n";
+	close FH;
+}
+
 ## connect()
 # Connect Keldair to the IRC server. Program will close if there an error after logging.
 # @return Returns socket object indicating that the connection was successful.

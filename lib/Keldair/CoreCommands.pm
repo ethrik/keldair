@@ -7,24 +7,22 @@ use warnings;
 use Keldair;
 
 $keldair->command_bind(DIE => sub {
-	my ($chan_p, $dst, @reason) = @_;
-
-	my $nick = $dst->nick;
-	my $chan = $chan_p->name;
+	my ($chan, $dst, @reason) = @_;
 
 	$keldair->quit((join ' ', @reason));
-	$keldair->log(INFO => "Shutting down by request of $nick from $chan.", 1);
+	$keldair->logf(INFO => 'Shutting down by request of %s from %s.', $dst->nick, $chan->name);
+	exit 0;
 });
 
 $keldair->command_bind(RESTART => sub {
-	my ($chan_p, $dst, $reason) = @_;
-
-	my $nick = $dst->nick;
-	my $chan = $chan_p->name;
+	my ($chan, $dst, $reason) = @_;
 
 	system 'perl keldair';
+	
 	$keldair->quit($reason);
-	$keldair->log(INFO => "Restarting by request of $nick from $chan.", 1);
+	$keldair->logf(INFO => 'Restarting by request of %s from %s.', $dst->nick, $chan->name);
+	
+	exit 0;
 });
 
 $keldair->command_bind(EVAL => sub {
@@ -48,7 +46,7 @@ $keldair->command_bind(REHASH => sub {
 
 	$keldair->hook_run(OnRehash => $chan, $dst);
 	$keldair->msg($chan, 'Rehashing keldair.conf.');
-	$keldair->log(INFO => $dst->nick.' is rehashing keldair.conf.')
+	$keldair->logf(INFO => '%s is rehashing keldair.conf.', $dst->nick);
 });
 
 $keldair->command_bind(PING => sub {
