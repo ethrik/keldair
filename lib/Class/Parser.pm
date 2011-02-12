@@ -56,7 +56,7 @@ my (%commands, %_commands);
 	},
 	KICK => sub {
 		my ($this, $origin, $cmd, $chan, $target, @reason) = @_;
-		my $nick = nick_form_host($origin);
+		my $nick = nick_from_host($origin);
 		$this->hook_run(OnKick => $nick, $chan, $target, (join ' ', @reason));
 	},
 	MODE => sub {

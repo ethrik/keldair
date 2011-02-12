@@ -20,11 +20,13 @@ sub joinChannel {
 	return 1;
 }
 
-## raw(str)
+## raw(str, ...)
 # Send a raw line to the server
 # @dat Data to send to the server
+# @... Variables to fill in %s in $dat
 sub raw {
-    my ($this, $dat) = @_;
+	my $this = shift;
+	my $dat = sprintf shift @_, @_;
 	my $res = $this->hook_run(OnBotPreRaw => $Class::Keldair::socket, $dat);
 	if ($res)
 	{
@@ -38,7 +40,7 @@ sub raw {
     print "S: $dat\n" if $this->debug;
 }
 
-## msg(str, str)
+## msg(object, msg)
 # PRIVMSG a target (channel/user) with a message
 # @target Channel or User to message
 # @msg Text to send
@@ -74,6 +76,11 @@ sub msg {
 	return $res if $res;
 }
 
+## notice(object, str, ...)
+# Send a NOTICE to a channel/nick
+# @target Nick/Channel object
+# @msg Message to send - may contain %s/%u/%d/etc
+# @... Variables to fill % in $msg.
 sub notice {
 	my $this = shift;
 	my $target = shift;
@@ -121,6 +128,76 @@ sub quit {
 	$this->raw("QUIT :$reason");
 	$this->hook_run(OnBotQuit => $reason);
 	return 1;
+}
+
+## setMode(object, char, ...)
+# SET (+) a mode on a channel/nick
+# @target Channel/Nick object to add modes to
+# @char Mode letter - ONLY ONE!!!
+# @args Any arguments $char may take
+sub setMode {
+	my ($this, $target, $char, @args) = @_;
+
+	if($char !~ m/^[A-Z]$/i)
+	{
+		$this->logf(WARN => 'setMode(): Invalid modechar %s - set one at a time!', $char);
+		return;
+	}
+
+	my $res = $this->hook_run(OnBotPreMode => $target, $char);
+	if($res)
+	{
+		if($res == 2 || $res == -2)
+		{
+			$this->logf(HOOK_DENY => '%s denied OnBotPreMode.', caller);
+			return $res;
+		}
+	}
+	if($target->isa('user'))
+	{
+		$this->raw('MODE '.$target->nick." +$char @args");
+		$this->logf(MODE => 'Set +%s on %s.', $char, $target->nick);
+	}
+	elsif($target->isa('channel'))
+	{
+		$this->raw('MODE '.$target->name." +$char @args");
+		$this->logf(MODE => 'Set +%s on %s.', $char, $target->name);
+	}
+	$target->add_mode($char);
+	return $res if $res;
+}
+
+## kick(object, object, str)
+# Kick a client from a channel
+# @chan Channel object to kick on
+# @user User object to kick
+# @reason Reason to supply
+sub kick {
+	my ($this, $chan, $user, $reason) = @_;
+	if(!$user->isa('user'))
+	{
+		$this->logf(WARN => 'kick(): Invalid target "%s" - can only kick users.', $user);
+		return;
+	}
+	if(!$chan->isa('channel'))
+	{
+		$this->logf(WARN => 'kick(): Invalid parameter for channel "%s" - can only kick on channels.', $chan);
+		return;
+	}
+	$reason ||= 'no reason';
+	my $res = $this->hook_run(OnBotPreKick => $chan, $user, $reason);
+	
+	if($res)
+	{
+		if($res == 2 || -2)
+		{
+			$this->logf(HOOK_DENY => '%s denied OnBotPreKick.', caller);
+			return $res;
+		}
+	}
+	$this->raw('KICK '.$chan->name.' '.$user->nick." :$reason");
+	$this->hook_run(OnBotKick => $chan, $user, $reason);
+	return $res if $res;
 }
 
 1;
