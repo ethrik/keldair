@@ -46,11 +46,11 @@ sub msg {
 	}
 	if($target->isa('channel'))
 	{
-  	 	$this->raw("PRIVMSG ".$target->name." :$msg");
+  	 	$this->poe->yield(privmsg => $target->name, $msg);
 	}
 	elsif($this->isa('user'))
 	{
-		$this->raw("PRIVMSG ".$target->nick." :$msg");
+		$this->poe->yield(privmsg => $target->nick, $msg);
 	}
 	else
 	{
@@ -84,11 +84,11 @@ sub notice {
 	}
 	if($target->isa('channel'))
 	{
-		$this->raw('NOTICE '.$target->name." :$msg");
+		$this->poe->yield(notice => $target->name, $msg);
 	}
 	elsif($target->isa('user'))
 	{
-		$this->raw('NOTICE '.$target->nick." :$msg");
+		$this->poe->yield(notice => $target->name, $msg);
 	}
 	else
 	{
@@ -110,24 +110,17 @@ sub quit {
 		$this->log(HOOK_DENY => "Stopped ".caller." from QUIT with '$reason'.");
 		return 0;
 	}
-	$this->raw("QUIT :$reason");
+	$this->poe->yield(quit => $reason);
 	$this->hook_run(OnBotQuit => $reason);
 	return 1;
 }
 
-## setMode(object, char, ...)
-# SET (+) a mode on a channel/nick
+## mode(object, str, str)
 # @target Channel/Nick object to add modes to
-# @char Mode letter - ONLY ONE!!!
+# @char Mode letter(s)
 # @args Any arguments $char may take
 sub setMode {
 	my ($this, $target, $char, @args) = @_;
-
-	if($char !~ m/^[A-Z]$/i)
-	{
-		$this->logf(WARN => 'setMode(): Invalid modechar %s - set one at a time!', $char);
-		return;
-	}
 
 	my $res = $this->hook_run(OnBotPreMode => $target, $char);
 	if($res)
@@ -140,15 +133,13 @@ sub setMode {
 	}
 	if($target->isa('user'))
 	{
-		$this->raw('MODE '.$target->nick." +$char @args");
-		$this->logf(MODE => 'Set +%s on %s.', $char, $target->nick);
+		$this->poe->yield(mode => $target->nick, $char, @args);
 	}
 	elsif($target->isa('channel'))
 	{
-		$this->raw('MODE '.$target->name." +$char @args");
-		$this->logf(MODE => 'Set +%s on %s.', $char, $target->name);
+		$this->poe->yield(mode => $target->name, $char, @args);
 	}
-	$target->add_mode($char);
+	
 	return $res if $res;
 }
 
@@ -180,7 +171,7 @@ sub kick {
 			return $res;
 		}
 	}
-	$this->raw('KICK '.$chan->name.' '.$user->nick." :$reason");
+	$this->poe->yield(kick => $chan, $user, $reason);
 	$this->hook_run(OnBotKick => $chan, $user, $reason);
 	return $res if $res;
 }
