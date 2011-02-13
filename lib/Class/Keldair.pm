@@ -4,7 +4,7 @@
 package Class::Keldair;
 use Mouse;
 use Config::JSON;
-use IO::Socket::IP;
+use POE::Component::IRC::State;
 use Keldair;
 use FindBin qw($Bin);
 
@@ -141,6 +141,13 @@ has 'channels' => (
 	}
 );
 
+has 'poe' => (
+	is => 'ro',
+	isa => 'Object',
+	default => sub { POE::Component::IRC::State->spawn() },
+	required => 1
+);
+
 ## hook_add(str, str, coderef)
 # Hook to an IRC event
 # @event IRC-Name of event (JOIN, PART, KICK, etc)
@@ -236,33 +243,25 @@ sub logf {
 # @return Returns socket object indicating that the connection was successful.
 sub connect {
 	my ($this) = @_;
-	
-	if($this->usessl)
-	{
-		require IO::Socket::SSL;
-		$socket = IO::Socket::SSL->new(
-			PeerAddr => $this->server,
-			PeerPort => $this->port,
-			Proto => 'tcp',
-			Timeout => 30,
-			SSL_use_cert => 1,
-			SSL_key_file => $config->get('keldair/key'),
-			SSL_cert_file => $config->get('keldair/cert'),
-			SSL_passwd_cb =>  sub { return $config->get('keldair/key_passwd') }
-		) || $this->log(WARN => "Could not connect to IRC! $!", 1);
-	}
-	else
-	{
-		$socket = IO::Socket::IP->new(
-			PeerAddr => $this->server,
-			PeerPort => $this->port,
-			Proto => 'tcp',
-			Timeout => 30
-		) || $this->log(WARN => "Could not connect to IRC! $!", 1);	
-	}
-
-	$this->log(INFO => 'Connected to IRC successfully.');
-	return $socket;
+	POE::Session->create(
+		inline_states => {
+			_start => sub {
+				$this->poe->yield(register => 'all');
+				$this->poe->yield(connect => {
+					Nick => $this->nick,
+					Username => $this->ident,
+					Ircname => $this->realname,
+					Server => $this->server,
+					Port => $this->port,
+					UseSSL => $this->usessl,
+					Flood => 'true'
+				});
+			},
+			irc_001 => sub {
+				$this->joinChannel($this->home)
+			},
+		}
+	);	
 }
 
 1;

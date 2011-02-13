@@ -24,24 +24,15 @@ use Keldair;
 use Keldair::Module::Help;
 use Keldair::CoreCommands;
 use Keldair::State;
+use POE;
 
 our $VERSION = $Keldair::VERSION;
 
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
-my $sock = $keldair->connect();
-$keldair->hook_run('OnPreConnect');
+$keldair->connect();
 
-while(my $buffer = <$sock>)
-{
-	print "R: $buffer" if $keldair->debug;
-	chomp $buffer;
-	chop $buffer;
-	$keldair->parse($buffer);
-}
-
-close $sock;
-$keldair->hook_run('OnDisconnect');
+POE::Kernel->run();
 
 # Kill the first PID we had
 local $SIG{CHLD} = sub {

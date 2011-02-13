@@ -15,7 +15,7 @@ sub joinChannel {
 		$this->log(HOOK_DENY => "Stopped ".caller." from joining $chan.");
 		return 0;
 	}
-	$this->raw("JOIN $chan");
+	$this->poe->yield(join => $chan);
 	$this->hook_run(OnBotJoin => $this->find_chan($chan));
 	return 1;
 }
@@ -24,21 +24,6 @@ sub joinChannel {
 # Send a raw line to the server
 # @dat Data to send to the server
 # @... Variables to fill in %s in $dat
-sub raw {
-	my $this = shift;
-	my $dat = sprintf shift @_, @_;
-	my $res = $this->hook_run(OnBotPreRaw => $Class::Keldair::socket, $dat);
-	if ($res)
-	{
-		if($res == 2 || $res == -2)
-		{
-			$this->log(HOOK_DENY => caller.' denied OnBotPreRaw.');
-			return $res;
-		}
-	}
-    print $Class::Keldair::socket "$dat\n";
-    print "S: $dat\n" if $this->debug;
-}
 
 ## msg(object, msg)
 # PRIVMSG a target (channel/user) with a message
