@@ -1,7 +1,8 @@
+#!/usr/bin/env perl
 # modinstall - Install modules from external GitHub repository
 # Copyright 2011 Alexandria M. Wolcott <alyx@woomoo.org>
 # Licensed under the 3-clause BSD.
-#!/usr/bin/env perl
+
 
 use strict;
 use warnings;
