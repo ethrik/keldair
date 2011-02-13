@@ -254,11 +254,15 @@ sub connect {
 					Server => $this->server,
 					Port => $this->port,
 					UseSSL => $this->usessl,
-					Flood => 'true'
+					Flood => 'true',
+					useipv6 => $this->config('keldair/useipv6'),
+					debug => $this->debug
 				});
 			},
 			irc_001 => sub {
-				$this->joinChannel($this->home)
+				$this->logf(INFO => 'Connected to %s.', $this->poe->server_name);
+				$this->hook_run('OnRaw001');
+				$this->joinChannel($this->home);
 			},
 		}
 	);	
