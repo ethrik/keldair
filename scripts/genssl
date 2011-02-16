@@ -1,4 +1,7 @@
 #!/usr/bin/env perl
+# genssl - Create SSL Certificate+Key pair for SSL connection with Keldair
+# Copyright 2011 Samuel Hoffman
+# Licensed under the 3-clause BSD.
 use strict;
 use warnings;
 use FindBin qw($Bin);
