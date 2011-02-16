@@ -44,8 +44,8 @@ if ($option_i) {
 	  or die("Cannot open file: $!");
 	print {$fh} $res->content;
 	close($fh) or die("Cannot close file: $!");
-	open(my $fh, '<', "$Bin/../lib/Keldair/Module/$module");
-	while (my $line = <$fh>) {
+	open(my $config, '<', "$Bin/../lib/Keldair/Module/$module");
+	while (my $line = <$config>) {
 		if ($line =~ /# modreq: (.*)/i) {
 			my @mods = split(',',$1);
 			print("$module requires the following modules to be installed from CPAN: ".join(' ',@mods)."\n");
@@ -54,6 +54,7 @@ if ($option_i) {
 			my $modconf = $1;
 		}
 	}
+	close($config);
 }
 
 
