@@ -44,10 +44,10 @@ $SIG{__DIE__} = sub {
 	}
 };
 
-*HOOK_PASS = 1; 		# Allow action to proceed.
-*HOOK_DENY = 2; 		# Do not allow action to proceed.
-*HOOK_DENY_EAT = -2;	# Do not allow action to proceed, and eat event.
-*HOOK_PASS_EAT = -1;	# Allow action to proceed, and eat event.
+sub HOOK_PASS () { 1; } # Allow action to proceed.
+sub HOOK_DENY () { 2; } # Do not allow action to proceed.
+sub HOOK_DENY_EAT () { -2; } # Do not allow action to proceed, and eat event.
+sub HOOK_PASS_EAT () { -1; } # Allow action to proceed, and eat event.
 
 # DENY = 1/-1
 # PASS = 2/-1
