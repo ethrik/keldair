@@ -3,7 +3,6 @@
 # Copyright 2011 Alexandria M. Wolcott <alyx@woomoo.org>
 # Licensed under the 3-clause BSD.
 
-
 use strict;
 use warnings;
 use FindBin qw($Bin);
@@ -12,7 +11,8 @@ use Furl;
 
 our $VERSION = '0.1.0';
 
-GetOptions( 'i=s' => \my $option_i, 'v' => \my $option_v, 'h' => \my $option_h ) or exit(1);
+GetOptions( 'i=s' => \my $option_i, 's=s' => \my $option_s, 'v' => \my $option_v, 'h' => \my $option_h ) or exit(1);
+
 
 if ($option_v) { print <<ENDVER;
 
@@ -48,18 +48,32 @@ if ($option_i) {
 	  or die("Cannot open file: $!");
 	print {$fh} $res->content;
 	close($fh) or die("Cannot close file: $!");
-	open(my $config, '<', "$Bin/../lib/Keldair/Module/$module");
-	while (my $line = <$config>) {
+	open(my $file, '<', "$Bin/../lib/Keldair/Module/$module");
+	while (my $line = <$file>) {
 		if ($line =~ /# modreq: (.*)/i) {
 			my @mods = split(',',$1);
 			print("$module requires the following modules to be installed from CPAN: ".join(' ',@mods)."\n");
 		}
 		if ($line =~ /# modconf: (.*)/i) {
 			my $modconf = $1;
+			open(my $config,'>>',"$Bin/etc/keldair.conf");
+			print {$config} $modconf."\n";
+			close $config;
 		}
 	}
-	close($config);
+	close($file);
 }
 
+if ($option_s) {
+	my $search = qr/$option_s/;
+	my $furl = Furl->new(
+		agent => "KeldairModinstall/$VERSION",
+		timeout => 10
+	);
+	my $res = $furl->get('https://github.com/ethrik/kmods/raw/master/LIST');
+	die $res->status_line unless $res->is_success;
+	my @modules = split("\n",$res->content);
+	foreach my $mod (@modules) { print "$mod\n" if $mod =~ $search; }
+}
 
 
