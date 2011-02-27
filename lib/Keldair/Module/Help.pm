@@ -38,10 +38,6 @@ $keldair->hook_add(OnMessage => sub {
 	{
 		$exec_cmd->($keldair->find_chan($chan), $keldair->find_user($nick), @args);
 	}
-	else
-	{
-		$keldair->msg($chan => "%s: No such command.", uc $cmd);
-	}
 });
 
 $keldair->command_bind(HELP => sub {

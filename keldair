@@ -21,12 +21,13 @@ BEGIN
 }
 
 use Keldair;
-use Keldair::Module::Help;
 use Keldair::CoreCommands;
 use Keldair::State;
 
 our $VERSION = $Keldair::VERSION;
 
+my $modules = $keldair->config('modules');
+$keldair->modload($_) foreach @{ $modules };
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
 my $sock = $keldair->connect();

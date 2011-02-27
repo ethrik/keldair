@@ -5,6 +5,7 @@ package Class::Keldair;
 use Mouse;
 use Config::JSON;
 use IO::Socket::IP;
+use Module::Load;
 use Keldair;
 use FindBin qw($Bin);
 
@@ -263,6 +264,12 @@ sub connect {
 
 	$this->log(INFO => 'Connected to IRC successfully.');
 	return $socket;
+}
+
+sub modload {
+	my ($this, $module) = @_;
+	eval { load 'Keldair::Module::'.$module; } or return;
+	return 1;
 }
 
 1;
