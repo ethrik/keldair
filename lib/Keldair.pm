@@ -7,7 +7,7 @@ use warnings;
 use Class::Keldair;
 use Sys::Hostname;
 use base 'Exporter';
-our @EXPORT = qw($keldair *HOOK_DENY *HOOK_PASS *HOOK_DENY_EAT *HOOK_PASS_EAT);
+our @EXPORT = qw($keldair &HOOK_DENY &HOOK_PASS &HOOK_DENY_EAT &HOOK_PASS_EAT);
 
 our (%V) = (
     'MAJOR' => 0,
