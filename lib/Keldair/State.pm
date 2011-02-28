@@ -9,7 +9,17 @@ use Keldair;
 use Class::Channel;
 use Class::User;
 
-my %isupport;
+my (%isupport,%ctcp);
+
+sub ctcp { 
+	my ( $self, $method, $type, $response ) = @_;
+	if ( $method eq 'add' ) {
+		$ctcp{$type} = @_;
+	}
+	elsif ( $method eq 'del' ) {
+		delete $ctcp{$type};
+	}
+}
 
 $keldair->hook_add(OnJoin => sub {
 	my ($nick, $chan) = @_;
