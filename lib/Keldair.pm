@@ -10,7 +10,7 @@ use base 'Exporter';
 our @EXPORT = qw($keldair &HOOK_DENY &HOOK_PASS &HOOK_DENY_EAT &HOOK_PASS_EAT);
 
 our (%V) = (
-    'MAJOR' => 0,
+    'MAJOR' => 3,
     'MINOR' => 0,
     'PATCH' => 0
 );
