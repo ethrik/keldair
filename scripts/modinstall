@@ -45,11 +45,11 @@ if ($option_i) {
 
 	my $res = $furl->get("https://github.com/ethrik/kmods/raw/master/$location/$module.pm");
 	die $res->status_line unless $res->is_success;
-	open(my $fh, '>', "$Bin/../lib/Keldair/Module/$module")
+	open(my $fh, '>', "$Bin/../lib/Keldair/Module/$module.pm")
 	  or die("Cannot open file: $!");
 	print {$fh} $res->content;
 	close($fh) or die("Cannot close file: $!");
-	open(my $file, '<', "$Bin/../lib/Keldair/Module/$module");
+	open(my $file, '<', "$Bin/../lib/Keldair/Module/$module.pm");
 	while (my $line = <$file>) {
 		if ($line =~ /# modreq: (.*)/i) {
 			my @mods = split(',',$1);
