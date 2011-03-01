@@ -7,6 +7,7 @@ use Config::JSON;
 use IO::Socket::IP;
 use Module::Load;
 use Keldair;
+use Keldair::State;
 use FindBin qw($Bin);
 
 with 'Class::Parser', 'Class::Interface', 'Class::Commands';
@@ -270,6 +271,17 @@ sub modload {
 	my ($this, $module) = @_;
 	eval { load 'Keldair::Module::'.$module; } or return;
 	return 1;
+}
+
+sub ctcp_add {
+	my ($this, $type, $response) = @_;
+	Keldair::State->ctcp('add',$type,$response);
+	return 1;
+}
+
+sub ctcp_del {
+	my ($this, $type, $response) = @_;
+	Keldair::State->ctcp('del',$type,$reponse);
 }
 
 1;
