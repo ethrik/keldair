@@ -7,7 +7,6 @@ use Config::JSON;
 use IO::Socket::IP;
 use Module::Load;
 use Keldair;
-use Keldair::State;
 use FindBin qw($Bin);
 
 with 'Class::Parser', 'Class::Interface', 'Class::Commands';
