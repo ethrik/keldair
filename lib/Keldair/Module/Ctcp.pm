@@ -2,7 +2,7 @@
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
 
-package Keldair::Module::;
+package Keldair::Module::Ctcp;
 use Keldair;
 use Keldair::State;
 use strict;

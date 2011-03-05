@@ -53,11 +53,16 @@ if ($option_i) {
 	while (my $line = <$file>) {
 		if ($line =~ /# modreq: (.*)/i) {
 			my @mods = split(',',$1);
-			print("$module requires the following modules to be installed from CPAN: ".join(' ',@mods)."\n");
+			my $nf;
+			foreach (@mods) {
+				eval('require '.$_.'; 1;') and next or $nf .= $_.' '
+			}
+			$nf = "None - You've got all the dependencies." if !$nf;
+			print("$module requires the following modules to be installed from CPAN: ".$nf."\n");
 		}
 		if ($line =~ /# modconf: (.*)/i) {
 			my $modconf = $1;
-			open(my $config,'>>',"$Bin/etc/keldair.conf");
+			open(my $config,'>>',"$Bin/../etc/keldair.conf") or die("Cannot open config: $!");
 			print {$config} $modconf."\n";
 			close $config;
 		}
