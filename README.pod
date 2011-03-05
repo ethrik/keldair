@@ -6,7 +6,7 @@ Keldair - A sexy IRC Bot in Perl.
 
 =head1 SYNOPSIS
 
-Keldair is an IRC bot. That's about it. Also, unicorns.
+Keldair is an IRC bot and a pink pony at the same time(!) That's about it. Also, unicorns.
 Your example.conf is found in etc/. Rename it to keldair.conf before starting.
 
 =cut
