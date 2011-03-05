@@ -12,7 +12,7 @@ BEGIN
 	{
 		die "Could not find etc/keldair.conf\n";
 	}
-	fork and exit;
+	fork and exit unless $^O eq 'MSWin32';
 	local $0 = 'keldair';
 	open (my $pidfile, '>',"$Bin/etc/keldair.pid")
 	  or die("Cannot open pidfile $Bin/etc/keldair.pid");
