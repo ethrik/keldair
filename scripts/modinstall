@@ -57,7 +57,7 @@ if ($option_i) {
 		}
 		if ($line =~ /# modconf: (.*)/i) {
 			my $modconf = $1;
-			open(my $config,'>>',"$Bin/etc/keldair.conf");
+			open(my $config,'>>',"$Bin/../etc/keldair.conf") or die("Cannot open config: $!");
 			print {$config} $modconf."\n";
 			close $config;
 		}
