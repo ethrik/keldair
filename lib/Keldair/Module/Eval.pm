@@ -16,9 +16,11 @@ $keldair->command_bind(EVAL => sub {
 
         my $expr = join ' ', @expr;
         my $result = eval $expr;
-
+        my $error = $@ if $@;
+        $result =~ s/(\n|\r|\0)/ /g if (defined $result and $result =~ /(\n|\r|\0)/);
         $keldair->msg($chan, $result) if defined $result;
-        $keldair->msg($chan, $@) if $@;
+        $error =~ s/(\n|\r|\0)/ /g if (defined $error and $error =~ /(\n|\r|\0)/);
+        $keldair->msg($chan,$error) if $error;
         $keldair->msg($chan, 'Done.');
     }
 );
