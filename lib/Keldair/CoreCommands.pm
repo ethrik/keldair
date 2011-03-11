@@ -33,9 +33,4 @@ $keldair->command_bind(REHASH => sub {
 	$keldair->logf(INFO => '%s is rehashing keldair.conf.', $dst->nick);
 });
 
-$keldair->command_bind(PING => sub {
-	my ($chan, $dst) = @_;
-	$keldair->msg($chan, '%s: Pong!', $dst->nick);
-});
-
 1;
