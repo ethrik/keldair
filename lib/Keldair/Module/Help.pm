@@ -6,7 +6,7 @@ package Keldair::Module::Help;
 use Keldair;
 use strict;
 use warnings;
-
+use Data::Dumper;
 my $trigger;
 
 $keldair->hook_add(OnRehash => sub {
@@ -18,7 +18,8 @@ $keldair->hook_add(OnRehash => sub {
 
 $keldair->hook_add(OnMessage => sub {
 	my ($chan, $nick, @msg) = @_;
-	
+	print Dumper($chan)."\n\n";
+	print Dumper($nick)."\n\n";
 	my $msg = join ' ', @msg;
 
 	my $cmd = substr $msg, length $trigger;

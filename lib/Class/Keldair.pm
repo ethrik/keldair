@@ -280,7 +280,7 @@ sub ctcp_add {
 
 sub ctcp_del {
 	my ($this, $type, $response) = @_;
-	Keldair::State->ctcp('del',$type,$reponse);
+	Keldair::State->ctcp('del',$type,$response);
 }
 
 1;

@@ -14,7 +14,7 @@ $keldair->hook_add(OnJoin => sub {
 
 $keldair->hook_add(OnBotPreJoin => sub {
 	my ($chan) = @_;
-	return *HOOK_DENY if $chan eq '#dev';
+	return HOOK_DENY if $chan eq '#dev';
 });
 
 1;
