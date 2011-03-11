@@ -25,22 +25,6 @@ $keldair->command_bind(RESTART => sub {
 	exit 0;
 });
 
-$keldair->command_bind(EVAL => sub {
-	my ($chan, $dst, @expr) = @_;
-	if(!defined $expr[0])
-	{
-		$keldair->msg($chan, "Syntax: \002EVAL\002 <expression>");
-		return;
-	}
-	
-	my $expr = join ' ', @expr;
-	my $result = eval $expr;
-
-	$keldair->msg($chan, $result) if defined $result;
-	$keldair->msg($chan, $@) if $@;
-	$keldair->msg($chan, 'Done.');
-});
-
 $keldair->command_bind(REHASH => sub {
 	my ($chan, $dst) = @_;
 
