@@ -28,7 +28,7 @@ $keldair->hook_add(OnConnect => sub {
 	$keldair->joinChannel($keldair->home);
 });
 
-$SIG{__WARN__} = sub {
+local $SIG{__WARN__} = sub {
 	for my $warn (@_)
 	{
 		$keldair->log(ERROR => $warn);
@@ -36,7 +36,7 @@ $SIG{__WARN__} = sub {
 	}
 };
 
-$SIG{__DIE__} = sub {
+local $SIG{__DIE__} = sub {
 	for my $die (@_)
 	{
 		$keldair->log(ERROR => $die);
