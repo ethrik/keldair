@@ -1,68 +1,8 @@
 #!/usr/bin/env perl
-# Copyright 2011 Ethrik Project, et al.
-# Licensed under the 3-clause BSD.
+
 use strict;
 use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
-my $pid = $$;
-BEGIN
-{
-	if(!-e "$Bin/etc/keldair.conf")
-	{
-		die "Could not find etc/keldair.conf\n";
-	}
-	fork and exit unless $^O eq 'MSWin32';
-	local $0 = 'keldair';
-	open (my $pidfile, '>',"$Bin/etc/keldair.pid")
-	  or die("Cannot open pidfile $Bin/etc/keldair.pid");
-	print {$pidfile} $$;
-	close $pidfile or die("Cannot close pidfile.");
-}
 
-use Keldair;
-use Keldair::CoreCommands;
-use Keldair::State;
-
-our $VERSION = $Keldair::VERSION;
-
-my $modules = $keldair->config('modules');
-$keldair->modload($_) foreach @{ $modules };
-$keldair->hook_run('OnStart');
-$keldair->hook_run('OnRehash');
-my $sock = $keldair->connect();
-$keldair->hook_run('OnPreConnect');
-
-while(my $buffer = <$sock>)
-{
-	print "R: $buffer" if $keldair->debug;
-	chomp $buffer;
-	chop $buffer;
-	$keldair->parse($buffer);
-}
-
-close $sock;
-$keldair->hook_run('OnDisconnect');
-
-# Kill the first PID we had
-local $SIG{CHLD} = sub {
-	print "CHLD - KILLING $pid\n";
-	kill(TERM => $pid);
-};
-
-local $SIG{TERM} = sub {
-	$keldair->quit('Caught SIGTERM, exiting.');
-	$keldair->log(INFO => 'Caught SIGTERM, exiting.', 1);
-};
-
-local $SIG{INT} = sub {
-	$keldair->quit('Caught SIGINT, exiting.');
-	$keldair->log(INFO => 'Caugt SIGINT, exiting.', 1);
-};
-
-END
-{
-	$keldair->hook_run('OnEnd');
-	unlink "$Bin/etc/keldair.pid";
-	$keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
-}
+do './bin/keldair';
