@@ -6,8 +6,8 @@ package Keldair::State;
 use strict;
 use warnings;
 use Keldair;
-use Class::Channel;
-use Class::User;
+use Class::Keldair::Channel;
+use Class::Keldair::User;
 
 my (%isupport,%ctcp);
 
@@ -25,14 +25,14 @@ $keldair->hook_add(OnJoin => sub {
 	my ($nick, $chan) = @_;
 	$keldair->raw("WHO $chan");
 	
-	my $_chan = Class::Channel->new(name => $chan);
+	my $_chan = Class::Keldair::Channel->new(name => $chan);
 	
 	$keldair->add_chan($chan, $_chan);
 });
 
 $keldair->hook_add(OnRaw352 => sub {
 		my ($chan, $ident, $host, $server, $nick, $flags, $real) = @_;
-		my $user = Class::User->new(
+		my $user = Class::Keldair::User->new(
 			nick => $nick,
 			ident => $ident,
 			realname => $ident,
