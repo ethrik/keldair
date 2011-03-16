@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+# Copyright 2011 Ethrik Project, et al.
+# Licensed under the 3-clause BSD.
+use strict;
+use warnings;
+use feature qw(say);
+
+use File::Copy;
+
+my $conf = "/etc/keldair.conf";
+say("setup-keldair isn't of use in a local installation. Aborting...") and exit if !-e $conf or !-e "/usr/bin/keldair";
+mkdir($ENV{HOME}."/.keldair");
+copy($conf, $ENV{HOME}."/.keldair");
+
+
