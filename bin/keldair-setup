@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# keldair-setup: Setup a users keldair (only for system-wide installations)
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
 use strict;
