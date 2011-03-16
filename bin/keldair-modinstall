@@ -6,6 +6,7 @@
 use strict;
 use warnings;
 use FindBin qw($Bin);
+use feature qw(say);
 use Getopt::Long;
 use Furl;
 
@@ -38,18 +39,25 @@ exit(1);
 
 if ($option_i) {
 	my ($location,$module) = split('/',$option_i);
+	say("Installing a module on a global scope is impossbile without root. Aborting...") and exit if $Bin eq "/usr/bin" and $> != 0;
 	my $furl = Furl->new(
 		agent => "KeldairModinstall/$VERSION",
 		timeout => 10
 	);
+        
+        my %path;
+        $path{config} = "$Bin/../etc/keldair.conf";
+        $path{config} = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
+        $path{mod} = "$Bin/../lib/Keldair/Module";
+        $path{mod} = "/usr/lib/perl5/site_perl/Keldair/Module" if $Bin eq "/usr/bin";
 
 	my $res = $furl->get("https://github.com/ethrik/kmods/raw/master/$location/$module.pm");
 	die $res->status_line unless $res->is_success;
-	open(my $fh, '>', "$Bin/../lib/Keldair/Module/$module.pm")
+	open(my $fh, '>', "$path{mod}/$module.pm")
 	  or die("Cannot open file: $!");
 	print {$fh} $res->content;
 	close($fh) or die("Cannot close file: $!");
-	open(my $file, '<', "$Bin/../lib/Keldair/Module/$module.pm");
+	open(my $file, '<', "$path{mod}/$module.pm");
 	while (my $line = <$file>) {
 		if ($line =~ /# modreq: (.*)/i) {
 			my @mods = split(',',$1);
@@ -58,12 +66,12 @@ if ($option_i) {
 				eval('require '.$_.'; 1;') and next or $nf .= $_.' '
 			}
 			$nf = "None - You've got all the dependencies." if !$nf;
-			print("$module requires the following modules to be installed from CPAN: ".$nf."\n");
+			say("$module requires the following modules to be installed from CPAN: ".$nf);
 		}
 		if ($line =~ /# modconf: (.*)/i) {
 			my $modconf = $1;
-			open(my $config,'>>',"$Bin/../etc/keldair.conf") or die("Cannot open config: $!");
-			print {$config} $modconf."\n";
+			open(my $config,'>>', $path{config}) or die("Cannot open config: $!");
+			say {$config} $modconf;
 			close $config;
 		}
 	}
@@ -79,7 +87,7 @@ if ($option_s) {
 	my $res = $furl->get('https://github.com/ethrik/kmods/raw/master/LIST');
 	die $res->status_line unless $res->is_success;
 	my @modules = split("\n",$res->content);
-	foreach my $mod (@modules) { print "$mod\n" if $mod =~ $search; }
+	foreach my $mod (@modules) { say $mod if $mod =~ $search; }
 }
 
 
