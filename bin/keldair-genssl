@@ -10,8 +10,13 @@ my $bits;
 $bits = $ARGV[0] if $ARGV[0];
 $bits ||= 1024;
 
+my %path;
+$path{config} = "$Bin/../etc";
+$path{config} = $ENV{HOME}."/.keldair" if $Bin eq "/usr/bin";
+
 system "openssl genrsa -des3 -out keldair.key $bits";
 system 'openssl req -new -key keldair.key -out keldair.csr';
 system 'openssl x509 -req -days 365 -in keldair.csr -signkey keldair.key -out keldair.cert';
 system 'cat keldair.cert keldair.key > keldair.pem';
-system "mv ./keldair.pem $Bin/../etc"; 
+system "mv ./keldair.pem $path{config}"; 
+system 'rm keldair.key keldair.cert keldair.csr';
