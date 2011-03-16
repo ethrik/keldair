@@ -62,8 +62,8 @@ local $SIG{INT} = sub {
 END
 {
 	$keldair->hook_run('OnEnd');
-        my $pidf = 'keldair.pid';
-        $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
+	my $pidf = 'keldair.pid';
+	$pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
 	unlink $pidf;
 	$keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
 }
