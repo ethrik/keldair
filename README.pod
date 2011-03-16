@@ -4,6 +4,10 @@
 
 Keldair - A sexy IRC Bot in Perl.
 
+=head1 VERSION
+
+3.01
+
 =head1 SYNOPSIS
 
 Keldair is an IRC bot and a pink pony at the same time(!) That's about it. Also, unicorns.
