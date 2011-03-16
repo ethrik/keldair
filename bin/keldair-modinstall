@@ -10,7 +10,7 @@ use feature qw(say);
 use Getopt::Long;
 use Furl;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 GetOptions( 'i=s' => \my $option_i, 's=s' => \my $option_s, 'v' => \my $option_v, 'h' => \my $option_h ) or exit(1);
 
