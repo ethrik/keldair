@@ -28,7 +28,7 @@ if ($sys) {
     say("Installation finished.");
 }
 else {
-    say("No configuration is needed for a non-system wide install at the moment.");
+    say("No additional configuration is needed for a non-system wide install at the moment.");
 }
 
 # vim: set et sw=4 ts=4:
