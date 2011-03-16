@@ -25,9 +25,9 @@ if ($sys) {
     say("$etc doesn't exist. Aborting...") and exit if !-d $etc;
     $etc .= "/keldair.conf";
     say("Installing...");
-    rcopy("$Bin/lib", $lib) and say("Successfully copied lib") or say("Couldn't copy lib: $!");
-    rcopy("$Bin/bin", $bin) and say("Sucessfully copied bin") or say("Couldn't copy bin: $!");
-    fcopy("$Bin/etc/example.conf", $etc) and say("Sucessfuly copied etc") or say("Couldn't copy etc: $!");
+    rcopy("$Bin/lib", $lib) and say("Successfully copied lib/") or say("Couldn't copy lib/: $!");
+    rcopy("$Bin/bin", $bin) and say("Sucessfully copied bin/") or say("Couldn't copy bin/: $!");
+    fcopy("$Bin/etc/example.conf", $etc) and say("Sucessfuly copied etc/") or say("Couldn't copy etc/: $!");
     say("Installation finished.");
 }
 else {
