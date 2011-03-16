@@ -12,5 +12,4 @@ my $conf = "/etc/keldair.conf";
 say("setup-keldair isn't of use in a local installation. Aborting...") and exit if !-e $conf or !-e "/usr/bin/keldair";
 mkdir($ENV{HOME}."/.keldair");
 copy($conf, $ENV{HOME}."/.keldair");
-
-
+say("Done.");
