@@ -8,7 +8,7 @@ my $pid = $$;
 
 BEGIN
 {
-	unshift @INC, '../lib' if $Bin ne "/usr/bin";
+	unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
 	fork and exit unless $^O eq 'MSWin32';
 	local $0 = 'keldair';
 	my $pidf = 'keldair.pid';
