@@ -3,13 +3,18 @@
 # Licensed under the 3-clause BSD.
 use strict;
 use warnings;
+use FindBin qw($Bin);
 my $pid = $$;
+
 BEGIN
 {
+	unshift @INC, '../lib' if $Bin ne "/usr/bin";
 	fork and exit unless $^O eq 'MSWin32';
 	local $0 = 'keldair';
-	open (my $pidfile, '>',"keldair.pid")
-	  or die("Cannot open pidfile keldair.pid");
+	my $pidf = 'keldair.pid';
+	$pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
+	open (my $pidfile, '>',$pidf)
+	  or die("Cannot open pidfile $pidf");
 	print {$pidfile} $$;
 	close $pidfile or die("Cannot close pidfile.");
 }
@@ -57,6 +62,8 @@ local $SIG{INT} = sub {
 END
 {
 	$keldair->hook_run('OnEnd');
-	unlink "keldair.pid";
+        my $pidf = 'keldair.pid';
+        $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
+	unlink $pidf;
 	$keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
 }

@@ -12,7 +12,9 @@ use FindBin qw($Bin);
 with 'Class::Keldair::Parser', 'Class::Keldair::Interface', 'Class::Keldair::Commands';
 
 # soemone will probably want to move this to a different location later...
-my $config = Config::JSON->new("$Bin/etc/keldair.conf");
+my $conf = "$Bin/../etc/keldair.conf";
+$conf = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
+my $config = Config::JSON->new($conf);
 our $socket;
 
 ## nick(str)
