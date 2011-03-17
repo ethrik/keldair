@@ -127,8 +127,9 @@ has 'users' => (
 		user_pairs => 'kv'
 	}
 );
+
 ## channels { }
-# Internal channel sate for the bot
+# Internal channel state for the bot
 # Channel => Object
 has 'channels' => (
 	traits => ['Hash'],
