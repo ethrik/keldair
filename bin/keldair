@@ -8,15 +8,18 @@ my $pid = $$;
 
 BEGIN
 {
-	unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
-	fork and exit unless $^O eq 'MSWin32';
-	local $0 = 'keldair';
-	my $pidf = 'keldair.pid';
-	$pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
-	open (my $pidfile, '>',$pidf)
-	  or die("Cannot open pidfile $pidf");
-	print {$pidfile} $$;
-	close $pidfile or die("Cannot close pidfile.");
+    unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
+    open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" );
+    open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" );
+    open STDERR, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" );
+    fork and exit unless $^O eq 'MSWin32';
+    local $0 = 'keldair';
+    my $pidf = 'keldair.pid';
+    $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
+    open (my $pidfile, '>',$pidf)
+        or die("Cannot open pidfile $pidf");
+    print {$pidfile} $$;
+    close $pidfile or die("Cannot close pidfile.");
 }
 
 use Keldair;
@@ -34,10 +37,10 @@ $keldair->hook_run('OnPreConnect');
 
 while(my $buffer = <$sock>)
 {
-	print "R: $buffer" if $keldair->debug;
-	chomp $buffer;
-	chop $buffer;
-	$keldair->parse($buffer);
+    print "R: $buffer" if $keldair->debug;
+    chomp $buffer;
+    chop $buffer;
+    $keldair->parse($buffer);
 }
 
 close $sock;
@@ -45,25 +48,25 @@ $keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
 local $SIG{CHLD} = sub {
-	print "CHLD - KILLING $pid\n";
-	kill(TERM => $pid);
+    print "CHLD - KILLING $pid\n";
+    kill(TERM => $pid);
 };
 
 local $SIG{TERM} = sub {
-	$keldair->quit('Caught SIGTERM, exiting.');
-	$keldair->log(INFO => 'Caught SIGTERM, exiting.', 1);
+    $keldair->quit('Caught SIGTERM, exiting.');
+    $keldair->log(INFO => 'Caught SIGTERM, exiting.', 1);
 };
 
 local $SIG{INT} = sub {
-	$keldair->quit('Caught SIGINT, exiting.');
-	$keldair->log(INFO => 'Caugt SIGINT, exiting.', 1);
+    $keldair->quit('Caught SIGINT, exiting.');
+    $keldair->log(INFO => 'Caugt SIGINT, exiting.', 1);
 };
 
 END
 {
-	$keldair->hook_run('OnEnd');
-	my $pidf = 'keldair.pid';
-	$pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
-	unlink $pidf;
-	$keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
+    $keldair->hook_run('OnEnd');
+    my $pidf = 'keldair.pid';
+    $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
+    unlink $pidf;
+    $keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
 }
