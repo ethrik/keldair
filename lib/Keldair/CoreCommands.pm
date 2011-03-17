@@ -4,6 +4,7 @@
 package Keldair::CoreCommands;
 use strict;
 use warnings;
+use FindBin qw($Bin);
 use Keldair;
 
 my $trigger;
@@ -50,7 +51,7 @@ $keldair->command_bind(DIE => sub {
 $keldair->command_bind(RESTART => sub {
         my ($chan, $dst, $reason) = @_;
 
-        system 'perl keldair';
+        system "$Bin/keldair";
 
         $keldair->quit($reason);
         $keldair->logf(INFO => 'Restarting by request of %s from %s.', $dst->nick, $chan->name);
