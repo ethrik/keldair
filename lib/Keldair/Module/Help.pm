@@ -6,7 +6,6 @@ package Keldair::Module::Help;
 use Keldair;
 use strict;
 use warnings;
-use Data::Dumper;
 
 $keldair->command_bind(HELP => sub {
 	my ($chan, $nick, $cmd) = @_;

@@ -8,13 +8,12 @@ use Keldair::State;
 use strict;
 use warnings;
 
-
 $keldair->hook_add(OnMessage => sub {
 	my ($chan, $nick, @msg) = @_;
 	
 	if ($msg[0] =~ /\001(.*)\001/) {
 		my (@content) = split(/ /,$1);
-		$keldair->msg($nick,"\001$Keldair::State::ctcp{$content[0]}\001")
+		$keldair->msg($nick, "\001$Keldair::State::ctcp{$content[0]}\001")
 		  if ($Keldair::State::ctcp{$content[0]};
 	}
 }
