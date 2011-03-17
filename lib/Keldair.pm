@@ -11,7 +11,7 @@ our @EXPORT = qw($keldair &HOOK_DENY &HOOK_PASS &HOOK_DENY_EAT &HOOK_PASS_EAT);
 
 our (%V) = (
     'MAJOR' => 3,
-    'MINOR' => 0,
+    'MINOR' => 6,
     'PATCH' => 0
 );
 
