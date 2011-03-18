@@ -40,9 +40,9 @@ has 'syntax' => (
     isa => 'HashRef[Str]',
     default => sub { {} },
     handles => {
-        help_add => 'set',
-        help_get => 'get',
-        help_del => 'delete',
+        syntax_add => 'set',
+        syntax_get => 'get',
+        syntax_del => 'delete',
     }
 );
 

@@ -15,6 +15,9 @@ $keldair->command_bind(HELP =>
         if ($parv[0]) { 
             if ($keldair->help_get(uc($parv[0]))) {
                 $keldair->msg($chan,'Help for %s: %s', uc($parv[0]), $keldair->help_get(uc($parv[0]))); 
+                if ($keldair->syntax_get(uc($parv[0]))) {
+                    $keldair->msg($chan,'Syntax: %s', $keldair->syntax_get(uc($parv[0])));
+                }
             }
             else {
                 $keldair->msg($chan, 'No help for %s.', uc($parv[0]));
