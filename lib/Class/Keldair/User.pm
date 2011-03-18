@@ -58,7 +58,7 @@ has 'modes' => (
 		has_mode => 'get',
 		del_mode => 'delete',
 		no_modes => 'is_empty',
-		mdoe_paris => 'kv'
+		mode_pairs => 'kv'
 	}
 );
 
