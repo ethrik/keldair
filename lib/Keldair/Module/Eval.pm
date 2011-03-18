@@ -8,6 +8,7 @@ use warnings;
 use Keldair;
 
 $keldair->help_add(EVAL => 'Evaluates a Perl expression.');
+$keldair->syntax_add(EVAL => 'EVAL <expression>');
 
 $keldair->command_bind(EVAL => sub {
         my ($chan, $dst, @expr) = @_;

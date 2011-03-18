@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 $keldair->help_add(HELP => 'Shows help for the command.');
+$keldair->syntax_add(HELP => 'HELP <command>');
 
 $keldair->command_bind(HELP =>
     sub {
