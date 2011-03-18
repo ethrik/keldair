@@ -14,3 +14,12 @@ Keldair is an IRC bot and a pink pony at the same time(!) That's about it. Also,
 Your example.conf is found in etc/. Rename it to keldair.conf before starting.
 
 =cut
+
+=head3 STYLE
+
+For those thinking of committing code to Keldair, we have a few, rather basic, requests.
+Please DO use proper Perl techniques (3-arg open(), no glob file handles, etc.).
+Please DON'T modify the existing code style (Don't run code through `perltidy`, etc.).
+Thank you for following our humble requests, happy hacking!
+
+=cut
