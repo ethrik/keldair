@@ -33,15 +33,14 @@ my (%commands, %_commands);
 	},
 	PRIVMSG => sub {
 		# R: :miniCruzer!sam@usr-bin-perl.use-strict.use-warnings PRIVMSG #dev :hot
-		my ($this, $origin, $cmd, $target, @msg) = @_;
+        my ($this, $origin, $cmd, $target, @msg) = @_;
 		my $m = shift @msg;
 		$m = substr $m, 1;
 		unshift @msg, $m;
 
 		my $nick = (split /!/, $origin)[0];
 		$nick = substr $nick, 1;
-		
-		$this->hook_run(OnMessage => $target, $nick, @msg);
+        $this->hook_run(OnMessage => $target, $nick, @msg);
 	},
 	JOIN => sub {
 		my ($this, $origin, $cmd, $chan) = @_;

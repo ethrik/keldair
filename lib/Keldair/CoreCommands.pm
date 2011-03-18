@@ -21,7 +21,7 @@ $keldair->hook_add(OnRehash => sub {
 
 $keldair->hook_add(OnMessage => sub {
         my ($chan, $nick, @msg) = @_;
-        
+
         my $msg = join ' ', @msg;
 
         my $cmd = substr $msg, length $trigger;
@@ -37,37 +37,44 @@ $keldair->hook_add(OnMessage => sub {
         my @args = split ' ', $args;
 
         my $exec_cmd = $keldair->command_get(uc $cmd);
-        if($exec_cmd)
-        {
-            $exec_cmd->($keldair->find_chan($chan), $keldair->find_user($nick), @args);
+
+        if($exec_cmd) {
+            if ($chan =~ /^(!|#|&)/) {
+                print "CHANNEL: $chan\n";
+                $exec_cmd->($keldair->find_chan($chan), $keldair->find_user($nick), @args);
+            }
+            else {
+                print "USER: $chan\n";
+                $exec_cmd->($keldair->find_user($chan), $keldair->find_user($nick), @args);
+            }
         }
     });
 
-$keldair->command_bind(DIE => sub {
-        my ($chan, $dst, @reason) = @_;
+    $keldair->command_bind(DIE => sub {
+            my ($chan, $dst, @reason) = @_;
 
-        $keldair->quit((join ' ', @reason));
-        $keldair->logf(INFO => 'Shutting down by request of %s from %s.', $dst->nick, $chan->name);
-        exit 0;
-    });
+            $keldair->quit((join ' ', @reason));
+            $keldair->logf(INFO => 'Shutting down by request of %s from %s.', $dst->nick, $chan->name);
+            exit 0;
+        });
 
-$keldair->command_bind(RESTART => sub {
-        my ($chan, $dst, $reason) = @_;
+    $keldair->command_bind(RESTART => sub {
+            my ($chan, $dst, $reason) = @_;
 
-        system "$Bin/keldair";
+            system "$Bin/keldair";
 
-        $keldair->quit($reason);
-        $keldair->logf(INFO => 'Restarting by request of %s from %s.', $dst->nick, $chan->name);
+            $keldair->quit($reason);
+            $keldair->logf(INFO => 'Restarting by request of %s from %s.', $dst->nick, $chan->name);
 
-        exit 0;
-    });
+            exit 0;
+        });
 
-$keldair->command_bind(REHASH => sub {
-        my ($chan, $dst) = @_;
+    $keldair->command_bind(REHASH => sub {
+            my ($chan, $dst) = @_;
 
-        $keldair->hook_run(OnRehash => $chan, $dst);
-        $keldair->msg($chan, 'Rehashing keldair.conf.');
-        $keldair->logf(INFO => '%s is rehashing keldair.conf.', $dst->nick);
-    });
+            $keldair->hook_run(OnRehash => $chan, $dst);
+            $keldair->msg($chan, 'Rehashing keldair.conf.');
+            $keldair->logf(INFO => '%s is rehashing keldair.conf.', $dst->nick);
+        });
 
-1;
+    1;
