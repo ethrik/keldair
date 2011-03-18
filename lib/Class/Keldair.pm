@@ -270,7 +270,7 @@ sub connect {
 
 sub modload {
 	my ($this, $module) = @_;
-	eval { load 'Keldair::Module::'.$module; } or return 0;
+	eval { load 'Keldair::Module::'.$module; } or return $@;
 	return 1;
 }
 
