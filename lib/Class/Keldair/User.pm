@@ -40,6 +40,12 @@ has 'server' => (
 	required => 1
 );
 
+has 'network' => {
+	isa => 'Str',
+	is => 'rw',
+	required => 1
+);
+
 has 'channels' => (
         traits => ['Hash'],
         is => 'ro',

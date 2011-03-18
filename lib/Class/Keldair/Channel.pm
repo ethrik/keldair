@@ -9,6 +9,12 @@ has 'name' => (
 	required => 1
 );
 
+has 'network' => (
+	isa => 'Str',
+	is => 'rw',
+	required => 1
+);
+
 has 'topic' => (
 	isa => 'Str',
 	is => 'rw'
