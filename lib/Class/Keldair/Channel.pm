@@ -32,10 +32,13 @@ has 'users' => (
 ### modes(modechar, RPL)
 ## add_mode(char, RPL)
 # Add's the mode to the channel, and its RPL description
+sub add_mode { }
 ## has_mode(char)
 # @return RPL for the char if it is set
+sub has_mode { }
 ## del_mode(char)
 # Delete the mode character from the channel
+sub del_mode { }
 has 'modes' => (
 	traits => ['Hash'],
 	is => 'ro',
