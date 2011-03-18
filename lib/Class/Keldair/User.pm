@@ -40,7 +40,7 @@ has 'server' => (
 	required => 1
 );
 
-has 'network' => {
+has 'network' => (
 	isa => 'Str',
 	is => 'rw',
 	required => 1
