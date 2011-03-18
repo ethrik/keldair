@@ -23,6 +23,7 @@ sub ctcp {
 
 $keldair->hook_add(OnJoin => sub {
 	my ($nick, $chan) = @_;
+	$chan =~ s/:// if $chan =~ /^:(#|&|!).*/;
 	$keldair->raw("WHO $chan");
 	
 	my $_chan = Class::Keldair::Channel->new(name => $chan);
