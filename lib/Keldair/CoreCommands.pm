@@ -9,6 +9,10 @@ use Keldair;
 
 my $trigger;
 
+$keldair->help_add(DIE => 'Causes the Keldair instance to shut down.');
+$keldair->help_add(RESTART => 'Restarts the Keldair instance.');
+$keldair->help_add(REHASH => 'Rehashes the config file.');
+
 $keldair->hook_add(OnRehash => sub {
         my $chan = shift;
         $trigger = $keldair->config('keldair/trigger');

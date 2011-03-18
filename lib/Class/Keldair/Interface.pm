@@ -22,6 +22,18 @@ has 'commands' => (
 	}
 );
 
+has 'help' => (
+    traits => ['Hash'],
+    is => 'ro',
+    isa => 'HashRef[Str]',
+    default => sub { {} },
+    handles => {
+        help_add => 'set',
+        help_get => 'get',
+        help_del => 'delete',
+    }
+);
+        
 ## command_bind(str, code)
 # Bind a command to the interface
 # @cmd Command name as accessed by a user - please keep it upper-cased

@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use Keldair;
 
+$keldair->help_add(PING => 'Throws a pong at the sender.');
+
 $keldair->command_bind(PING => sub {
     my ($chan, $dst) = @_;
     $keldair->msg($chan, '%s: Pong!', $dst->nick);

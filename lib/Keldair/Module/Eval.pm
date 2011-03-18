@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use Keldair;
 
+$keldair->help_add(EVAL => 'Evaluates a Perl expression.');
+
 $keldair->command_bind(EVAL => sub {
         my ($chan, $dst, @expr) = @_;
         if(!defined $expr[0])
@@ -26,3 +28,4 @@ $keldair->command_bind(EVAL => sub {
     }
 );
 
+1;
