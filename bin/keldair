@@ -9,7 +9,6 @@ my $pid = $$;
 
 BEGIN
 {
-    my ($dbug);
     unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
     local $0 = 'keldair';
     my $pidf = "$Bin/../etc/keldair.pid";
