@@ -9,11 +9,6 @@ my $pid = $$;
 BEGIN
 {
     unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
-    use Keldair;
-    open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
-    open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
-    open STDERR, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
-    fork and exit unless $^O eq 'MSWin32' or $keldair->debug;
     local $0 = 'keldair';
     my $pidf = 'keldair.pid';
     $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
@@ -23,8 +18,15 @@ BEGIN
     close $pidfile or die("Cannot close pidfile.");
 }
 
+use Keldair;
 use Keldair::CoreCommands;
 use Keldair::State;
+
+open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
+open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
+open STDERR, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
+fork and exit unless $^O eq 'MSWin32' or $keldair->debug;
+
 
 our $VERSION = $Keldair::VERSION;
 
