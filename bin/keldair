@@ -10,7 +10,7 @@ BEGIN
 {
     unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
     local $0 = 'keldair';
-    my $pidf = 'keldair.pid';
+    my $pidf = "$Bin/../etc/keldair.pid";
     $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
     open (my $pidfile, '>',$pidf)
         or die("Cannot open pidfile $pidf");
