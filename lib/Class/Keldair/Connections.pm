@@ -7,6 +7,7 @@ use IO qw(Socket Select);
 use IO::Socket::IP
 
 our %sockets = ();
+our $debug = 0;
 
 sub new {
 	my $class = shift;
@@ -30,6 +31,14 @@ sub del {
 	return 0 if !$self->{selector}->exists($self->{sockets}->{$params{name}}) and !defined $self->{sockets}->{$params{name}};
 	delete $self->{sockets}->{$params{name}};
 	$self->{selector}->remove($self->{sockets}->{params{name}}) and return 1;
+	return;
+}
+
+sub write {
+	my ($self, $sock, $data) = @_;
+	# XXX: We should be deleting the selector if the socket is dead or vice versa. Same for above sub.
+	return 0 if !$self->{selector}->exists($self->{sockets}->{$sock}) or !defined $self->{sockets}->{$sock};
+	$self->{sockets}->{$sock}->send("$data\r\n") and say("$sock <<: $data") if $debug;
 	return;
 }
 
