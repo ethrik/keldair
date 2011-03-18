@@ -1,13 +1,16 @@
 #!/usr/bin/env perl
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
+package main;
 use strict;
 use warnings;
 use FindBin qw($Bin);
+use Getopt::Long;
 my $pid = $$;
 
 BEGIN
 {
+    my ($dbug);
     unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
     local $0 = 'keldair';
     my $pidf = "$Bin/../etc/keldair.pid";
@@ -22,11 +25,15 @@ use Keldair;
 use Keldair::CoreCommands;
 use Keldair::State;
 
+our ($dbug, $cfile);
+GetOptions("debug!" => \$dbug, "config=s" => \&cfile);
+$keldair->debug($dbug) if defined $dbug;
+$cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
+
 open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDERR, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 fork and exit unless $^O eq 'MSWin32' or $keldair->debug;
-
 
 our $VERSION = $Keldair::VERSION;
 
@@ -67,7 +74,7 @@ local $SIG{INT} = sub {
 END
 {
     $keldair->hook_run('OnEnd');
-    my $pidf = 'keldair.pid';
+    my $pidf = "$Bin/../etc/keldair.pid";
     $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
     unlink $pidf;
     $keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
