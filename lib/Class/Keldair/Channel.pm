@@ -12,7 +12,7 @@ has 'name' => (
 has 'network' => (
 	isa => 'Str',
 	is => 'rw',
-	required => 1
+	required => 0 
 );
 
 has 'topic' => (

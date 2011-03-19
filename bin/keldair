@@ -54,7 +54,6 @@ while(my $buffer = <$sock>)
     print "R: $buffer" if $keldair->debug;
     chomp $buffer;
     chop $buffer;
-	print "Parsing $buffer";
     $keldair->parse($buffer);
 }
 
