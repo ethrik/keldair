@@ -4,8 +4,9 @@
 use strict;
 use warnings;
 use FindBin qw($Bin);
-use POSIX;
+use POSIX qw(BUFSIZ);
 use Getopt::Long;
+use feature qw(say);
 my $pid = $$;
 
 BEGIN
@@ -25,8 +26,6 @@ use Keldair;
 use Keldair::CoreCommands;
 use Keldair::State;
 use Class::Keldair::Connections;
-use Keldair::Module::Help;
-use Keldair::Module::Eval;
 
 our ($dbug, $cfile);
 GetOptions("debug!" => \$dbug, "config=s" => \&cfile);
@@ -40,35 +39,34 @@ fork and exit unless $^O eq 'MSWin32' or $keldair->debug; # This cannot be compr
 
 our $VERSION = $Keldair::VERSION;
 
+our %STATS;
+
 my $modules = $keldair->config('modules');
 $keldair->modload($_) foreach @{ $modules };
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
-my $sock = $keldair->connect();
-$keldair->hook_run('OnPreConnect');
-=head1
+
+#my $sock = $keldair->connect();
+#$keldair->hook_run('OnPreConnect');
 while (1) {
     foreach my $sock ($manager->{selector}->can_read(1)) {
         my $network;
         foreach (keys %{$manager->{sockets}}) {
             if ($manager->{sockets}->{$_} eq $sock) { $network = $_; }
             my $buffer;
-            recv $sock, $buffer, POSIX::BUFSIZ;
-            print "<$netname> R: $buffer" if $keldair->debug;
+            recv $sock, $buffer, BUFSIZ, 0;
+            while ($buffer =~ s/(.*\n)//) {
+                my $line = $1;
+                $STATS{'inB'} += length($line);
+                $line =~ s/(\r\n)//g;
+                say "<$netname> R: $line" if $keldair->debug;
+                $keldair->parse($network, $line);
+            }
         }
     }
 }
-=cut
-while(my $buffer = <$sock>)
-{
-    print "R: $buffer" if $keldair->debug;
-    chomp $buffer;
-    chop $buffer;
-    $keldair->parse($buffer);
-}
 
-close $sock;
-$keldair->hook_run('OnDisconnect');
+#$keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
 # I think that by saying 'local', we do not recieve the desired effect here ... - miniCruzer
