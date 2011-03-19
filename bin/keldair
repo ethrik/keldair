@@ -22,6 +22,7 @@ BEGIN
 use Keldair;
 use Keldair::CoreCommands;
 use Keldair::State;
+use Class::Keldair::Connections;
 
 our ($dbug, $cfile);
 GetOptions("debug!" => \$dbug, "config=s" => \&cfile);
@@ -39,8 +40,21 @@ my $modules = $keldair->config('modules');
 $keldair->modload($_) foreach @{ $modules };
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
-my $sock = $keldair->connect();
-$keldair->hook_run('OnPreConnect');
+#my $sock = $keldair->connect();
+#$keldair->hook_run('OnPreConnect');
+
+while (1) {
+
+    foreach my $sock ($manager->{selector}->can_read(1)) {
+        my $network;
+        foreach (keys %{$manager->{sockets}}) {
+            if ($manager->{sockets}->{$_} eq $sock) { $network = $_; }
+            my $buffer;
+            recv $sock, $buffer, POSIX::BUFSIZ;
+            print "<$netname> R: $buffer" if $keldair->debug;
+        }
+    }
+}
 
 while(my $buffer = <$sock>)
 {
