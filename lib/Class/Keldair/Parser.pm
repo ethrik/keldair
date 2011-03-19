@@ -18,9 +18,10 @@ my (%commands, %_commands);
 		my $nick = (split /!/, $origin, 1)[0]; # just in case the server allowed the origin to have more than 1 '!' in the hostmask
 		$nick = substr $nick, 1;
 
+        my $message = join(' ', @msg );
 		if($nick)
 		{
-			$this->hook_run(OnNotice => $network, $nick, $target, @msg);
+			$this->hook_run(OnNotice => $network, $nick, $target, $message);
 		}
 		## Potential Bug
 		# If the bot cannot find the nick by the '!', it will assume server notice
@@ -28,7 +29,7 @@ my (%commands, %_commands);
 		else
 		{
 			my $servname = substr $origin, 1;
-			$this->hook_run(OnServerNotice => $network, $servname, $target, @msg);
+			$this->hook_run(OnServerNotice => $network, $servname, $target, $message);
 		}
 	},
 	PRIVMSG => sub {
@@ -39,7 +40,8 @@ my (%commands, %_commands);
 
 		my $nick = (split /!/, $origin)[0];
 		$nick = substr $nick, 1;
-        $this->hook_run(OnMessage => $network, $target, $nick, @msg);
+        my $message = join(' ', @msg);
+        $this->hook_run(OnMessage => $network, $target, $nick, $message);
 	},
 	JOIN => sub {
 		my ($this, $network, $origin, $cmd, $chan) = @_;
