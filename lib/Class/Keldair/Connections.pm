@@ -1,5 +1,7 @@
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
+#
+# CONVERT THIS TO MOOSE/MOUSE...
 
 package Class::Keldair::Connections;
 use feature qw(say);
