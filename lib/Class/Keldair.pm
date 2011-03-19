@@ -274,7 +274,15 @@ sub connect {
 
 sub modload {
 	my ($this, $module) = @_;
-	eval { load 'Keldair::Module::'.$module; } or return $@;
+	if(eval{
+		load 'Keldair::Module::'.$module;
+		1;
+	}) {
+		$this->log(MODLOAD => "Successfully loaded $module.");
+	} else {
+		$this->log(WARN => "Could not load $module! $@");
+		return $@;
+	}
 	return 1;
 }
 

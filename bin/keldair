@@ -46,27 +46,9 @@ $keldair->modload($_) foreach @{ $modules };
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
 
-#my $sock = $keldair->connect();
-#$keldair->hook_run('OnPreConnect');
-while (1) {
-    foreach my $sock ($manager->{selector}->can_read(1)) {
-        my $network;
-        foreach (keys %{$manager->{sockets}}) {
-            if ($manager->{sockets}->{$_} eq $sock) { $network = $_; }
-            my $buffer;
-            recv $sock, $buffer, BUFSIZ, 0;
-            while ($buffer =~ s/(.*\n)//) {
-                my $line = $1;
-                $STATS{'inB'} += length($line);
-                $line =~ s/(\r\n)//g;
-                say "<$netname> R: $line" if $keldair->debug;
-                $keldair->parse($network, $line);
-            }
-        }
-    }
-}
-
-#$keldair->hook_run('OnDisconnect');
+my $sock = $keldair->connect();
+$keldair->hook_run('OnPreConnect');
+$keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
 # I think that by saying 'local', we do not recieve the desired effect here ... - miniCruzer
