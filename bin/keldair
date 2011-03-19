@@ -54,6 +54,7 @@ while(my $buffer = <$sock>)
     print "R: $buffer" if $keldair->debug;
     chomp $buffer;
     chop $buffer;
+	print "Parsing $buffer";
     $keldair->parse($buffer);
 }
 
@@ -61,19 +62,18 @@ close $sock;
 $keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
-# I think that by saying 'local', we do not recieve the desired effect here ... - miniCruzer
-local $SIG{CHLD} = sub {
+$SIG{CHLD} = sub {
     print "CHLD - KILLING $pid\n";
     kill(TERM => $pid);
 };
 
-local $SIG{TERM} = sub {
+$SIG{TERM} = sub {
     $keldair->quit('Caught SIGTERM, exiting.');
     $keldair->log(INFO => 'Caught SIGTERM, exiting.', 1);
 };
 
-local $SIG{INT} = sub {
-    $keldair->quit('Caught SIGINT, exiting.');
+$SIG{INT} = sub {
+   $keldair->quit('Caught SIGINT, exiting.');
     $keldair->log(INFO => 'Caugt SIGINT, exiting.', 1);
 };
 

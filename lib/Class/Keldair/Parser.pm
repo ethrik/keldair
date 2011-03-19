@@ -139,7 +139,8 @@ my (%commands, %_commands);
 # @line \n-Terminated line from the server
 sub parse {
 	my ($this, $network, $line) = @_;
-	$this->log(WARN => 'parse(): Did not get an IRC line when called!', 1) if !$line;
+	my $class = caller;
+	$this->log(WARN => "parse(): Did not get an IRC line when called! (called by: $class", 1) if !$line;
 	my @s = split / /, $line;
 	
 	if(exists $commands{uc($s[1])})
