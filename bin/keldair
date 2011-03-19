@@ -4,12 +4,14 @@
 use strict;
 use warnings;
 use FindBin qw($Bin);
+use POSIX;
 use Getopt::Long;
 my $pid = $$;
 
 BEGIN
 {
     unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
+    unshift @INC, "$ENV{HOME}/.keldair/lib" if $Bin eq "/usr/bin";
     local $0 = 'keldair';
     my $pidf = "$Bin/../etc/keldair.pid";
     $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
