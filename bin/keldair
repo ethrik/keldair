@@ -13,10 +13,10 @@ BEGIN
     local $0 = 'keldair';
     my $pidf = "$Bin/../etc/keldair.pid";
     $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
-    open (my $pidfile, '>',$pidf)
+    open (my $pidfile, '>', $pidf)
         or die("Cannot open pidfile $pidf");
     print {$pidfile} $$;
-    close $pidfile or die("Cannot close pidfile.");
+    close $pidfile or die("Cannot close pidfile.\n");
 }
 
 use Keldair;
@@ -32,7 +32,7 @@ $cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc
 open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDERR, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
-fork and exit unless $^O eq 'MSWin32' or $keldair->debug;
+fork and exit unless $^O eq 'MSWin32' or $keldair->debug; # This cannot be compressed into one, you have to break it into a few lines. We will never reach $keldair->debug
 
 our $VERSION = $Keldair::VERSION;
 
@@ -44,7 +44,6 @@ $keldair->hook_run('OnRehash');
 #$keldair->hook_run('OnPreConnect');
 
 while (1) {
-
     foreach my $sock ($manager->{selector}->can_read(1)) {
         my $network;
         foreach (keys %{$manager->{sockets}}) {
@@ -68,6 +67,7 @@ close $sock;
 $keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
+# I think that by saying 'local', we do not recieve the desired effect here ... - miniCruzer
 local $SIG{CHLD} = sub {
     print "CHLD - KILLING $pid\n";
     kill(TERM => $pid);
