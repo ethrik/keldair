@@ -25,7 +25,7 @@ $keldair->hook_add(OnJoin => sub {
 	$chan =~ s/:// if $chan =~ /^:(#|&|!).*/;
 	$keldair->raw("WHO $chan");
 	
-	my $_chan = Class::Keldair::Channel->new(name => $chan);
+	my $_chan = Class::Keldair::Channel->new(name => $chan, network => 'TODO');
 	
 	$keldair->add_chan($chan, $_chan);
 });
@@ -37,6 +37,7 @@ $keldair->hook_add(OnRaw352 => sub {
 			ident => $ident,
 			realname => $ident,
 			host => $host,
+			network => 'TODO',
 			server => $server
 		);
 		$keldair->log(STATE => "Adding $nick!$ident\@$host to $chan:Users - Adding $chan to $nick:Channels.");
