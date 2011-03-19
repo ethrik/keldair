@@ -110,6 +110,7 @@ has 'hooks' => (
 		hook_list => 'kv'
 	}
 );
+
 ## users { }
 # Internal user state for the bot, with users as objects
 # Nick => Object
@@ -194,6 +195,8 @@ sub hook_run {
 # Retrieve a config value from keldair.conf
 # @directive JSON Directive where to find the value
 # @return If Config::JSON can find the directive, the value is returned
+#
+# TODO: Turn this into the actual Config::JSON package (ie: $keldair->config->get(...), and $keldair->config->set(...)
 sub config {
 	my ($this, $directive) = @_;
 	return $config->get($directive);
@@ -237,6 +240,7 @@ sub logf {
 ## connect()
 # Connect Keldair to the IRC server. Program will close if there an error after logging.
 # @return Returns socket object indicating that the connection was successful.
+# TODO: Bind to a host
 sub connect {
 	my ($this) = @_;
 	
@@ -274,15 +278,16 @@ sub modload {
 	return 1;
 }
 
+# TODO: Turn CTCP into a hashref trait like hooks, etc., unless its not possible
 sub ctcp_add {
 	my ($this, $type, $response) = @_;
-	Keldair::State->ctcp('add',$type,$response);
+	Keldair::State->ctcp('add', $type,$response);
 	return 1;
 }
 
 sub ctcp_del {
 	my ($this, $type, $response) = @_;
-	Keldair::State->ctcp('del',$type,$response);
+	Keldair::State->ctcp('del', $type,$response);
 }
 
 1;

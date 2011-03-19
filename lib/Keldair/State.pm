@@ -8,7 +8,7 @@ use Keldair;
 use Class::Keldair::Channel;
 use Class::Keldair::User;
 
-my (%isupport,%ctcp);
+my (%isupport, %ctcp);
 
 sub ctcp { 
 	my ( $self, $method, $type, $response ) = @_;
@@ -82,6 +82,5 @@ $keldair->hook_add(OnRaw005 => sub {
 		}
 	}
 });
-
 
 1;
