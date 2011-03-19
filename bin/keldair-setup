@@ -11,5 +11,8 @@ use File::Copy;
 my $conf = "/etc/keldair.conf";
 say("setup-keldair isn't of use in a local installation. Aborting...") and exit if !-e $conf or !-e "/usr/bin/keldair";
 mkdir($ENV{HOME}."/.keldair");
+mkdir($ENV{HOME}.'/.keldair/lib');
+mkdir($ENV{HOME}.'/.keldair/lib/Keldair');
+mkdir($ENV{HOME}.'/.keldair/lib/Keldair/Module');
 copy($conf, $ENV{HOME}."/.keldair");
 say("Done.");
