@@ -62,7 +62,7 @@ sub msg {
 	{
   	 	$this->raw("PRIVMSG ".$target->name." :$msg");
 	}
-	elsif($target->isa('user'))
+	elsif($this->isa('user'))
 	{
 		$this->raw("PRIVMSG ".$target->nick." :$msg");
 	}

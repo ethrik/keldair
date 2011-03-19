@@ -48,6 +48,16 @@ $keldair->hook_run('OnRehash');
 
 my $sock = $keldair->connect();
 $keldair->hook_run('OnPreConnect');
+
+while(my $buffer = <$sock>)
+{
+    print "R: $buffer" if $keldair->debug;
+    chomp $buffer;
+    chop $buffer;
+    $keldair->parse($buffer);
+}
+
+close $sock;
 $keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
