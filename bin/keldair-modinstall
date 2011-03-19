@@ -49,7 +49,8 @@ if ($option_i) {
         $path{config} = "$Bin/../etc/keldair.conf";
         $path{config} = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
         $path{mod} = "$Bin/../lib/Keldair/Module";
-        $path{mod} = "/usr/lib/perl5/site_perl/Keldair/Module" if $Bin eq "/usr/bin";
+        $path{mod} = "/usr/lib/perl5/site_perl/Keldair/Module" if $Bin eq "/usr/bin" && $> == 0;
+        $path{mod} = "$ENV{HOME}/.keldair" if $Bin eq "/usr/bin" && $> != 0;
 
 	my $res = $furl->get("https://github.com/ethrik/kmods/raw/master/$location/$module.pm");
 	die $res->status_line unless $res->is_success;
