@@ -40,6 +40,7 @@ fork and exit unless $^O eq 'MSWin32' or $keldair->debug; # This cannot be compr
 our $VERSION = $Keldair::VERSION;
 
 our %STATS;
+$STATS{'start'} = time;
 
 my $modules = $keldair->config('modules');
 $keldair->modload($_) foreach @{ $modules };
@@ -48,6 +49,8 @@ $keldair->hook_run('OnRehash');
 
 #my $sock = $keldair->connect();
 #$keldair->hook_run('OnPreConnect');
+my $manager = Class::Keldair::Connections->new;
+
 while (1) {
     foreach my $sock ($manager->{selector}->can_read(1)) {
         my $network;
