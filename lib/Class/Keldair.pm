@@ -274,14 +274,49 @@ sub connect {
 
 sub modload {
 	my ($this, $module) = @_;
-	if(eval{
-		load 'Keldair::Module::'.$module;
-		1;
-	}) {
-		$this->log(MODLOAD => "Successfully loaded $module.");
+	my $class = caller;
+	
+	my $res = $this->hook_run(OnPreModLoad => $module);
+	
+	if($res < 0)
+	{
+		$this->log(HOOK_EATEN => "OnPreModLoad: Not loading $module; stopped by $class.");
+		return 0;
+	}
+
+	my $modr = $module;
+	$modr =~ s#::#/#g;
+	$modr .= '.pm';	
+
+	if(-e "Keldair/Module/$modr")
+	{
+				
+		if(eval{
+			load 'Keldair::Module::'.$module;
+			1;
+		}) {
+			$this->log(MODLOAD => "Successfully loaded $module.");
+		} else {
+			$this->log(WARN => "Could not load $module! $@");
+			return 0;
+		}
 	} else {
-		$this->log(WARN => "Could not load $module! $@");
-		return $@;
+		$this->logf(MODLOAD => 'Cannot find "%s" in Keldair::Module, searching in @INC.', $module);
+		if(-e $modr)
+		{
+			if(eval{
+				load $module;
+				1;
+			}) {
+				$this->log(MODLOAD => "Successfully loaded $module, but it was found outside of Keldair::Module. Consider moving it...");
+			} else {
+				$this->log(WARN => "Could not load $module! $!");
+				return 0;
+			}
+		} else {
+			$this->log(WARN => "Could not load $module! Not found in Keldair::Module or in \@INC.");
+			return 0;
+		}
 	}
 	return 1;
 }

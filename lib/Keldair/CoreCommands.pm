@@ -11,13 +11,14 @@ my $trigger;
 $keldair->help_add(DIE => 'Causes the Keldair instance to shut down.');
 $keldair->help_add(RESTART => 'Restarts the Keldair instance.');
 $keldair->help_add(REHASH => 'Rehashes the config file.');
+$keldair->help_add(MODLOAD => 'Load a module in lib/Keldair/Modules/');
 
 $keldair->hook_add(OnRehash => sub {
         my $chan = shift;
         $trigger = $keldair->config('keldair/trigger');
         $keldair->msg($chan => 'Updating trigger to %s', $trigger) unless !$chan;
         return 0;
-    }); 
+}); 
 
 $keldair->hook_add(OnMessage => sub {
         my ($chan, $nick, @msg) = @_;
@@ -46,33 +47,43 @@ $keldair->hook_add(OnMessage => sub {
                 $exec_cmd->($keldair->find_user($chan), $keldair->find_user($nick), @args);
             }
         }
-    });
+});
 
-    $keldair->command_bind(DIE => sub {
-            my ($chan, $dst, @reason) = @_;
+$keldair->command_bind(DIE => sub {
+	my ($chan, $dst, @reason) = @_;
+    $keldair->quit((join ' ', @reason));
+    $keldair->logf(INFO => 'Shutting down by request of %s from %s.', $dst->nick, $chan->name);
+    exit 0;
+});
 
-            $keldair->quit((join ' ', @reason));
-            $keldair->logf(INFO => 'Shutting down by request of %s from %s.', $dst->nick, $chan->name);
-            exit 0;
-        });
+$keldair->command_bind(RESTART => sub {
+    my ($chan, $dst, $reason) = @_;
+	system "$Bin/keldair";
 
-    $keldair->command_bind(RESTART => sub {
-            my ($chan, $dst, $reason) = @_;
+    $keldair->quit($reason);
+    $keldair->logf(INFO => 'Restarting by request of %s from %s.', $dst->nick, $chan->name);
+    exit 0;
+});
 
-            system "$Bin/keldair";
+$keldair->command_bind(REHASH => sub {
+    my ($chan, $dst) = @_;
 
-            $keldair->quit($reason);
-            $keldair->logf(INFO => 'Restarting by request of %s from %s.', $dst->nick, $chan->name);
+    $keldair->hook_run(OnRehash => $chan, $dst);
+    $keldair->msg($chan, 'Rehashing keldair.conf.');
+    $keldair->logf(INFO => '%s is rehashing keldair.conf.', $dst->nick);
+});
 
-            exit 0;
-        });
+$keldair->command_bind(MODLOAD => sub {
+	my ($chan, $dst, $file) = @_;
+	my $res = $keldair->modload($file);
+	if($res == 1)
+	{
+		$keldair->msg($chan, '%s: Loaded %s successfully.', $dst->nick, $file);
+	} else
+	{
+		$keldair->msg($chan, '%s: Could not load %s!', $dst->nick, $file);
+	}
 
-    $keldair->command_bind(REHASH => sub {
-            my ($chan, $dst) = @_;
+});
 
-            $keldair->hook_run(OnRehash => $chan, $dst);
-            $keldair->msg($chan, 'Rehashing keldair.conf.');
-            $keldair->logf(INFO => '%s is rehashing keldair.conf.', $dst->nick);
-        });
-
-    1;
+1;

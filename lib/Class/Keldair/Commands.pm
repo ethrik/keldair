@@ -58,19 +58,8 @@ sub msg {
 			return $res;
 		}
 	}
-	if($target->isa('channel'))
-	{
-  	 	$this->raw("PRIVMSG ".$target->name." :$msg");
-	}
-	elsif($this->isa('user'))
-	{
-		$this->raw("PRIVMSG ".$target->nick." :$msg");
-	}
-	else
-	{
-		$this->log(ERROR => "msg(): Recieved invalid target ($target) - neither channel or user.");
-		return $res;
-	}
+  	
+	$this->raw("PRIVMSG ".$target->name." :$msg");
 	$this->hook_run(OnBotMessage => $target, $msg);
 	return $res if $res;
 }
@@ -96,19 +85,8 @@ sub notice {
 			return $res;
 		}
 	}
-	if($target->isa('channel'))
-	{
-		$this->raw('NOTICE '.$target->name." :$msg");
-	}
-	elsif($target->isa('user'))
-	{
-		$this->raw('NOTICE '.$target->nick." :$msg");
-	}
-	else
-	{
-		$this->log(ERROR => "notice(): Recieved invalid target ($target) - neither channel or user.");
-		return $res;
-	}
+	
+	$this->raw('NOTICE '.$target->name." :$msg");
 	$this->hook_run(OnBotNotice => $target, $msg);
 	return $res if $res
 }

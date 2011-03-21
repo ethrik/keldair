@@ -24,8 +24,10 @@ BEGIN
 
 use Keldair;
 use Keldair::CoreCommands;
+use Keldair::Module::Help;
 use Keldair::State;
 use Class::Keldair::Connections;
+use Keldair::Module::Alias;
 
 our ($dbug, $cfile);
 GetOptions("debug!" => \$dbug, "config=s" => \&cfile);
