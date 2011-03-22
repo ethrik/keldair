@@ -51,9 +51,8 @@ $keldair->hook_run('OnRehash');
 my $manager = $keldair->manager;
 
 foreach (keys %{ $keldair->config('servers') }) {
-	my $net = $_;
-	if ($keldair->config("servers/$net/autoconnect")) {
-		$keldair->manager->add(name => $net, addr => $keldair->config("servers/$net/address"), port => $keldair->config("servers/$net/port"));
+	if ($keldair->config("servers/$_/autoconnect")) {
+		$keldair->manager->add(name => $_, addr => $keldair->config("servers/$_/address"), port => $keldair->config("servers/$_/port"));
 	}
 }
 
