@@ -61,20 +61,9 @@ sub msg {
 			return $res;
 		}
 	}
-	if($target->isa('channel'))
-	{
-  	 	$this->raw($network, "PRIVMSG ".$target->name." :$msg");
-	}
-	elsif($target->isa('user'))
-	{
-		$this->raw($network, "PRIVMSG ".$target->nick." :$msg");
-	}
-	else
-	{
-		$this->log(ERROR => "msg(): Recieved invalid target ($target) - neither channel or user.");
-		return $res;
-	}
-	$this->hook_run(OnBotMessage => $target, $msg);
+
+	$this->raw($network, "PRIVMSG ".$target->name." :$msg");
+	$this->hook_run(OnBotMessage => $network, $target, $msg);
 	return $res if $res;
 }
 
@@ -101,19 +90,7 @@ sub notice {
 			return $res;
 		}
 	}
-	if($target->isa('channel'))
-	{
-		$this->raw($network, 'NOTICE '.$target->name." :$msg");
-	}
-	elsif($target->isa('user'))
-	{
-		$this->raw($network, 'NOTICE '.$target->nick." :$msg");
-	}
-	else
-	{
-		$this->log(ERROR => "notice(): Recieved invalid target ($target) - neither channel or user.");
-		return $res;
-	}
+	$this->raw($network, "NOTICE ".$target->name." :$msg");
 	$this->hook_run(OnBotNotice => $network, $target, $msg);
 	return $res if $res
 }
@@ -125,7 +102,7 @@ sub notice {
 sub quit {
 	my ($this, $network, $reason) = @_;
 	$reason ||= "leaving";
-	if($this->hook_run(OnBotPreQuit => $reason))
+	if($this->hook_run(OnBotPreQuit => $network, $reason))
 	{
 		$this->log(HOOK_DENY => "Stopped ".caller." from QUIT on $network with '$reason'.");
 		return 0;
