@@ -7,14 +7,76 @@ use IO::Socket::IP;
 use Module::Load;
 use Keldair;
 use FindBin qw($Bin);
+use Class::Keldair::Connections;
 
 with 'Class::Keldair::Parser', 'Class::Keldair::Interface', 'Class::Keldair::Commands';
 
-# soemone will probably want to move this to a different location later...
+my $manager = Class::Keldair::Connections->new;
+
+# someone will probably want to move this to a different location later...
 my $conf = "$Bin/../etc/keldair.conf";
 $conf = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
-my $config = Config::JSON->new($conf);
-our $socket;
+
+## conf
+# Object to Config::JSON - uses all methods from this package,
+# and is already pointed to default config.
+has 'conf' => (
+	is => 'ro',
+	isa => 'Object',
+	default => sub { new Config::JSON($conf) },
+	required => 1
+);
+
+## nick(str)
+# Nickname to register with - this may be truncated depending on length limit on server.
+# @default Nick as found in keldair.conf
+has 'nick' => (
+	isa => 'Str',
+	is => 'rw',
+	required => 1,
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/nick');
+	}
+);
+
+## ident(str)
+# "Username" to register connection with. May NOT have spaces
+# @default Ident found in keldair.conf
+has 'ident' => (
+	isa => 'Str',
+	is => 'rw',
+	required => 1,
+	default => sub {
+		my $this = shift;	
+		$this->conf->get('keldair/ident');
+	}
+);
+
+## realname(str)
+# GECOS for the bot client
+# @default Find the realname string from keldair.conf
+has 'realname' => (
+	isa => 'Str',
+	required => 1,
+	is => 'rw',
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/realname');
+	}
+);
+
+## home(str)
+# Home channel to join when bot gets connected to the server
+# @default Configuration value
+has 'home' => (
+	isa => 'Str',
+	is => 'rw',
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/home');
+	}
+);
 
 ## debug(int)
 # Print IRC Input / Output between client and server
@@ -22,7 +84,10 @@ our $socket;
 has 'debug' => (
 	isa => 'Int',
 	is => 'rw',
-	default => $config->get('keldair/debug')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/debug');
+	}
 );
 
 ## hooks { }
@@ -131,7 +196,13 @@ sub hook_run {
 # TODO: Turn this into the actual Config::JSON package (ie: $keldair->config->get(...), and $keldair->config->set(...)
 sub config {
 	my ($this, $directive) = @_;
-	return $config->get($directive);
+	return $this->conf->get($directive);
+}
+
+## manager()
+# Returns the manager instance
+sub manager {
+	return $manager;
 }
 
 ## log(str, str, int)
@@ -163,46 +234,11 @@ sub logf {
 
 	my $msg = sprintf shift @_, @_;
 
-	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
+	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->conf->get('keldair/log')." for logging. $!\n";
 	my $logtime = localtime;
 	print {$fh} "[$logtime] $level: $msg\n";
 	close $fh;
 }
-
-## connect()
-# Connect Keldair to the IRC server. Program will close if there an error after logging.
-# @return Returns socket object indicating that the connection was successful.
-# TODO: Bind to a host
-#sub connect {
-#	my ($this) = @_;
-#	
-#	if($this->usessl)
-#	{
-#		require IO::Socket::SSL;
-#		$socket = IO::Socket::SSL->new(
-#			PeerAddr => $this->server,
-#			PeerPort => $this->port,
-#			Proto => 'tcp',
-#			Timeout => 30,
-#			SSL_use_cert => 1,
-#			SSL_key_file => $config->get('keldair/key'),
-#			SSL_cert_file => $config->get('keldair/cert'),
-#			SSL_passwd_cb =>  sub { return $config->get('keldair/key_passwd') }
-#		) || $this->log(WARN => "Could not connect to IRC! $!", 1);
-#	}
-#	else
-#	{
-#		$socket = IO::Socket::IP->new(
-#			PeerAddr => $this->server,
-#			PeerPort => $this->port,
-#			Proto => 'tcp',
-#			Timeout => 30
-#		) || $this->log(WARN => "Could not connect to IRC! $!", 1);	
-#	}
-#
-#	$this->log(INFO => 'Connected to IRC successfully.');
-#	return $socket;
-#}
 
 sub modload {
 	my ($this, $module) = @_;

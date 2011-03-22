@@ -19,13 +19,15 @@ our $VERSION = "$V{MAJOR}.$V{MINOR}.$V{PATCH}";
 our $keldair = Class::Keldair->new();
 
 $keldair->hook_add(OnPreConnect => sub {
-	$keldair->raw("PASS ".$keldair->config('server/password')) if $keldair->config('server/password');
-	$keldair->raw("NICK ".$keldair->nick);
-	$keldair->raw("USER ".$keldair->ident.' '.hostname.' '.$keldair->config('server/address')." :".$keldair->realname);
+	my $network = shift;
+	$keldair->raw($network, "PASS ".$keldair->config("servers/$network/password")) if $keldair->config("servers/$network/password");
+	$keldair->raw($network, "USER ".$keldair->ident.' '.hostname.' '.$keldair->config("servers/$network/address")." :".$keldair->realname);
+	$keldair->raw($network, "NICK ".$keldair->nick);
 });
 
 $keldair->hook_add(OnConnect => sub {
-	$keldair->joinChannel($keldair->home);
+	my $network = shift;
+	$keldair->joinChannel($network, $keldair->home);
 });
 
 local $SIG{__WARN__} = sub {
