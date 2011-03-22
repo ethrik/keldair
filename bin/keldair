@@ -73,17 +73,17 @@ while (1) {
 
 # Kill the first PID we had
 # I think that by saying 'local', we do not recieve the desired effect here ... - miniCruzer
-local $SIG{CHLD} = sub {
+$SIG{CHLD} = sub {
     print "CHLD - KILLING $pid\n";
     kill(TERM => $pid);
 };
 
-local $SIG{TERM} = sub {
+$SIG{TERM} = sub {
     $keldair->quit('Caught SIGTERM, exiting.');
     $keldair->log(INFO => 'Caught SIGTERM, exiting.', 1);
 };
 
-local $SIG{INT} = sub {
+$SIG{INT} = sub {
     $keldair->quit('Caught SIGINT, exiting.');
     $keldair->log(INFO => 'Caugt SIGINT, exiting.', 1);
 };
