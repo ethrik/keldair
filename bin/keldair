@@ -6,6 +6,7 @@ use warnings;
 use FindBin qw($Bin);
 use POSIX qw(BUFSIZ);
 use Getopt::Long;
+use Config::JSON;
 use feature qw(say);
 my $pid = $$;
 
@@ -31,10 +32,10 @@ use Keldair::Module::Alias;
 use Keldair::Module::Account;
 
 our ($dbug, $cfile);
-GetOptions("debug!" => \$dbug, "config=s" => \&cfile);
+GetOptions("debug!" => \$dbug, "config=s" => \$cfile);
 $keldair->debug($dbug) if defined $dbug;
 $cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
-
+$keldair->conf(Config::JSON->new($cfile));
 open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDERR, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;

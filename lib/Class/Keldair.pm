@@ -19,10 +19,10 @@ our $socket;
 # Object to Config::JSON - uses all methods from this package,
 # and is already pointed to default config.
 has 'conf' => (
-	is => 'ro',
-    isa => 'Object',
-    default => sub { new Config::JSON($conf) },
-    required => 1
+	is => 'rw',
+	isa => 'Object',
+	default => sub { new Config::JSON($conf) },
+	required => 1
 );
 
 ## nick(str)
