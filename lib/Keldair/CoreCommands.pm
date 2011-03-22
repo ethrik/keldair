@@ -71,7 +71,7 @@ $keldair->hook_add(OnMessage => sub {
         });
 
     $keldair->command_bind(REHASH => sub {
-            my ($chan, $dst) = @_;
+            my ($network, $chan, $dst) = @_;
 
             $keldair->hook_run(OnRehash => $network, $chan, $dst);
             $keldair->msg($chan, 'Rehashing keldair.conf.');
