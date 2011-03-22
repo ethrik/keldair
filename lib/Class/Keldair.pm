@@ -21,7 +21,7 @@ $conf = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
 # Object to Config::JSON - uses all methods from this package,
 # and is already pointed to default config.
 has 'conf' => (
-	is => 'ro',
+	is => 'rw',
 	isa => 'Object',
 	default => sub { new Config::JSON($conf) },
 	required => 1
