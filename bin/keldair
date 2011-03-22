@@ -28,7 +28,7 @@ use Keldair::State;
 use Class::Keldair::Connections;
 
 our ($dbug, $cfile);
-GetOptions("debug!" => \$dbug, "config=s" => \&cfile);
+GetOptions("debug!" => \$dbug, "config=s" => \$cfile);
 $keldair->debug($dbug) if defined $dbug;
 $cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
 
@@ -62,7 +62,7 @@ while (1) {
                 my $line = $1;
                 $STATS{'inB'} += length($line);
                 $line =~ s/(\r\n)//g;
-                say "<$netname> R: $line" if $keldair->debug;
+                say "<$network> R: $line" if $keldair->debug;
                 $keldair->parse($network, $line);
             }
         }
