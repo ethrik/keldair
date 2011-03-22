@@ -73,6 +73,12 @@ sub notice {
 	my $this = shift;
 	my $target = shift;
 	my $msg = sprintf(shift @_, @_);
+	
+	if(!defined $target)
+	{
+		$this->log(WARN => 'notice(): No target specified.');
+		return 0;
+	}
 
 	my $res = $this->hook_run(OnBotPreNotice => $target, $msg);
 	

@@ -13,8 +13,17 @@ with 'Class::Keldair::Parser', 'Class::Keldair::Interface', 'Class::Keldair::Com
 # soemone will probably want to move this to a different location later...
 my $conf = "$Bin/../etc/keldair.conf";
 $conf = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
-my $config = Config::JSON->new($conf);
 our $socket;
+
+## conf
+# Object to Config::JSON - uses all methods from this package,
+# and is already pointed to default config.
+has 'conf' => (
+	is => 'ro',
+    isa => 'Object',
+    default => sub { new Config::JSON($conf) },
+    required => 1
+);
 
 ## nick(str)
 # Nickname to register with - this may be truncated depending on length limit on server.
@@ -23,7 +32,10 @@ has 'nick' => (
 	isa => 'Str',
 	is => 'rw',
 	required => 1,
-	default => $config->get('keldair/nick')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/nick');
+	}
 );
 
 ## ident(str)
@@ -33,7 +45,10 @@ has 'ident' => (
 	isa => 'Str',
 	is => 'rw',
 	required => 1,
-	default => $config->get('keldair/ident')
+	default => sub {
+		my $this = shift;	
+		$this->conf->get('keldair/ident');
+	}
 );
 
 ## realname(str)
@@ -43,7 +58,10 @@ has 'realname' => (
 	isa => 'Str',
 	required => 1,
 	is => 'rw',
-	default => $config->get('keldair/realname')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/realname');
+	}
 );
 
 ## server(str)
@@ -53,7 +71,10 @@ has 'server' => (
 	isa => 'Str',
 	is => 'rw',
 	required => 1,
-	default => $config->get('server/address')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('server/address');
+	}
 );
 
 ## port(int)
@@ -63,7 +84,10 @@ has 'port' => (
 	isa => 'Int',
 	is => 'rw',
 	required => 1,
-	default => $config->get('server/port')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('server/port')
+	}
 );
 
 ## usessl(int)
@@ -72,7 +96,10 @@ has 'port' => (
 has 'usessl' => (
 	isa => 'Int',
 	is => 'rw',
-	default => $config->get('server/usessl')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('server/usessl');
+	}
 );
 
 ## debug(int)
@@ -81,7 +108,10 @@ has 'usessl' => (
 has 'debug' => (
 	isa => 'Int',
 	is => 'rw',
-	default => $config->get('keldair/debug')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/debug');
+	}
 );
 
 ## home(str)
@@ -90,7 +120,10 @@ has 'debug' => (
 has 'home' => (
 	isa => 'Str',
 	is => 'rw',
-	default => $config->get('keldair/home')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/home');
+	}
 );
 
 ## hooks { }
@@ -199,7 +232,7 @@ sub hook_run {
 # TODO: Turn this into the actual Config::JSON package (ie: $keldair->config->get(...), and $keldair->config->set(...)
 sub config {
 	my ($this, $directive) = @_;
-	return $config->get($directive);
+	return $this->conf->get($directive);
 }
 
 ## log(str, str, int)
@@ -253,9 +286,9 @@ sub connect {
 			Proto => 'tcp',
 			Timeout => 30,
 			SSL_use_cert => 1,
-			SSL_key_file => $config->get('keldair/key'),
-			SSL_cert_file => $config->get('keldair/cert'),
-			SSL_passwd_cb =>  sub { return $config->get('keldair/key_passwd') }
+			SSL_key_file => $this->conf->get('keldair/key'),
+			SSL_cert_file => $this->conf->get('keldair/cert'),
+			SSL_passwd_cb =>  sub { return $this->conf->get('keldair/key_passwd') }
 		) || $this->log(WARN => "Could not connect to IRC! $!", 1);
 	}
 	else
