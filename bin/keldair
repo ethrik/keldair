@@ -6,6 +6,7 @@ use warnings;
 use FindBin qw($Bin);
 use POSIX qw(BUFSIZ);
 use Getopt::Long;
+use Config::JSON;
 use feature qw(say);
 my $pid = $$;
 
@@ -31,6 +32,7 @@ our ($dbug, $cfile);
 GetOptions("debug!" => \$dbug, "config=s" => \$cfile);
 $keldair->debug($dbug) if defined $dbug;
 $cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
+$keldair->conf(Config::JSON->new($cfile));
 
 open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
@@ -46,25 +48,31 @@ my $modules = $keldair->config('modules');
 $keldair->modload($_) foreach @{ $modules };
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
+my $manager = $keldair->manager;
 
-#my $sock = $keldair->connect();
-#$keldair->hook_run('OnPreConnect');
-my $manager = Class::Keldair::Connections->new;
+foreach (keys %{ $keldair->config('servers') }) {
+	my $net = $_;
+	if ($keldair->config("servers/$net/autoconnect")) {
+		$keldair->manager->add(name => $net, addr => $keldair->config("servers/$net/address"), port => $keldair->config("servers/$net/port"));
+	}
+}
 
 while (1) {
-    foreach my $sock ($manager->{selector}->can_read(1)) {
+    foreach my $sock ($keldair->manager->{selector}->can_read(1)) {
         my $network;
-        foreach (keys %{$manager->{sockets}}) {
-            if ($manager->{sockets}->{$_} eq $sock) { $network = $_; }
-            my $buffer;
-            recv $sock, $buffer, BUFSIZ, 0;
-            while ($buffer =~ s/(.*\n)//) {
-                my $line = $1;
-                $STATS{'inB'} += length($line);
-                $line =~ s/(\r\n)//g;
-                say "<$network> R: $line" if $keldair->debug;
-                $keldair->parse($network, $line);
-            }
+        foreach (keys %{$keldair->manager->{sockets}}) {
+            if ($keldair->manager->{sockets}->{$_} eq $sock) { $network = $_; }
+	}
+        my $buffer;
+        recv $sock, $buffer, BUFSIZ, 0;
+        while ($buffer =~ s/(.*\n)//) {
+	    $STATS{$network}{'inL'}++;
+	    if ($STATS{$network}{'inL'} == 1) { $keldair->hook_run('OnPreConnect' => $network); }
+            my $line = $1;
+            $STATS{'inB'} += length($line);
+            $line =~ s/(\r\n)//g;
+            say "<$network> R: $line" if $keldair->debug;
+            $keldair->parse($network, $line);
         }
     }
 }
