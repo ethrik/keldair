@@ -8,13 +8,13 @@ use Mouse::Role;
 # Attempt to join a channel
 # @chan Channel to join
 sub joinChannel {
-	my ($this, $chan) = @_;
+	my ($this, $network, $chan) = @_;
 	if($this->hook_run(OnBotPreJoin => $this->find_chan($chan)) < 0)
 	{
-		$this->log(HOOK_DENY => "Stopped ".caller." from joining $chan.");
+		$this->log(HOOK_DENY => "Stopped ".caller." from joining $chan\@\$network.");
 		return 0;
 	}
-	$this->raw("JOIN $chan");
+	$this->raw($network, "JOIN $chan");
 	$this->hook_run(OnBotJoin => $this->find_chan($chan));
 	return 1;
 }
@@ -25,6 +25,7 @@ sub joinChannel {
 # @... Variables to fill in %s in $dat
 sub raw {
 	my $this = shift;
+	my $network = shift;
 	my $dat = sprintf shift @_, @_;
 	my $res = $this->hook_run(OnBotPreRaw => $Class::Keldair::socket, $dat);
 	if ($res)
@@ -35,36 +36,38 @@ sub raw {
 			return $res;
 		}
 	}
-    print $Class::Keldair::socket "$dat\n";
-    print "S: $dat\n" if $this->debug;
+       $this->manager->write($network, $dat);
+       print "<$network> S: $dat\n" if $this->debug;
 }
 
 ## msg(object, msg)
 # PRIVMSG a target (channel/user) with a message
+# @network Network
 # @target Channel or User to message
 # @msg Text to send
 sub msg {
 	my $this = shift;
+	my $network = shift;
 	my $target = shift;
 	my $msg = sprintf(shift @_, @_);
 	
-	my $res = $this->hook_run(OnBotPreMessage => $target, $msg);
+	my $res = $this->hook_run(OnBotPreMessage => $network, $target, $msg);
 	
 	if($res)
 	{
 		if($res == 2 || $res == -2)
 		{
-			$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target with '$msg'.");
+			$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target\@$network with '$msg'.");
 			return $res;
 		}
 	}
 	if($target->isa('channel'))
 	{
-  	 	$this->raw("PRIVMSG ".$target->name." :$msg");
+  	 	$this->raw($network, "PRIVMSG ".$target->name." :$msg");
 	}
 	elsif($target->isa('user'))
 	{
-		$this->raw("PRIVMSG ".$target->nick." :$msg");
+		$this->raw($network, "PRIVMSG ".$target->nick." :$msg");
 	}
 	else
 	{
@@ -77,55 +80,58 @@ sub msg {
 
 ## notice(object, str, ...)
 # Send a NOTICE to a channel/nick
+# @network Network
 # @target Nick/Channel object
 # @msg Message to send - may contain %s/%u/%d/etc
 # @... Variables to fill % in $msg.
 sub notice {
 	my $this = shift;
+	my $network = shift;
 	my $target = shift;
 	my $msg = sprintf(shift @_, @_);
 
-	my $res = $this->hook_run(OnBotPreNotice => $target, $msg);
+	my $res = $this->hook_run(OnBotPreNotice => $network, $target, $msg);
 	
 	if($res)
 	{
 		if($res == 2 || $res == -2)
 		{
 			my $class = caller;
-			$this->log(HOOK_DENY => "Stopped $class from sending NOTICE to $target with '$msg'.");
+			$this->log(HOOK_DENY => "Stopped $class from sending NOTICE to $target\@$network with '$msg'.");
 			return $res;
 		}
 	}
 	if($target->isa('channel'))
 	{
-		$this->raw('NOTICE '.$target->name." :$msg");
+		$this->raw($network, 'NOTICE '.$target->name." :$msg");
 	}
 	elsif($target->isa('user'))
 	{
-		$this->raw('NOTICE '.$target->nick." :$msg");
+		$this->raw($network, 'NOTICE '.$target->nick." :$msg");
 	}
 	else
 	{
 		$this->log(ERROR => "notice(): Recieved invalid target ($target) - neither channel or user.");
 		return $res;
 	}
-	$this->hook_run(OnBotNotice => $target, $msg);
+	$this->hook_run(OnBotNotice => $network, $target, $msg);
 	return $res if $res
 }
 
 ## quit(str)
 # Quit from IRC with a reason
+# @network Network
 # @reason Quit-Reason to use. If not defined, it will default to "leaving"
 sub quit {
-	my ($this, $reason) = @_;
+	my ($this, $network, $reason) = @_;
 	$reason ||= "leaving";
 	if($this->hook_run(OnBotPreQuit => $reason))
 	{
-		$this->log(HOOK_DENY => "Stopped ".caller." from QUIT with '$reason'.");
+		$this->log(HOOK_DENY => "Stopped ".caller." from QUIT on $network with '$reason'.");
 		return 0;
 	}
-	$this->raw("QUIT :$reason");
-	$this->hook_run(OnBotQuit => $reason);
+	$this->raw($network, "QUIT :$reason");
+	$this->hook_run(OnBotQuit => $network, $reason);
 	return 1;
 }
 
@@ -135,7 +141,7 @@ sub quit {
 # @char Mode letter - ONLY ONE!!!
 # @args Any arguments $char may take
 sub setMode {
-	my ($this, $target, $char, @args) = @_;
+	my ($this, $network, $target, $char, @args) = @_;
 
 	if($char !~ m/^[A-Z]$/i)
 	{
@@ -143,7 +149,7 @@ sub setMode {
 		return;
 	}
 
-	my $res = $this->hook_run(OnBotPreMode => $target, $char);
+	my $res = $this->hook_run(OnBotPreMode => $network, $target, $char);
 	if($res)
 	{
 		if($res == 2 || $res == -2)
@@ -154,13 +160,13 @@ sub setMode {
 	}
 	if($target->isa('user'))
 	{
-		$this->raw('MODE '.$target->nick." +$char @args");
-		$this->logf(MODE => 'Set +%s on %s.', $char, $target->nick);
+		$this->raw($network, 'MODE '.$target->nick." +$char @args");
+		$this->logf(MODE => 'Set +%s on %s@%s.', $char, $target->nick, $network);
 	}
 	elsif($target->isa('channel'))
 	{
-		$this->raw('MODE '.$target->name." +$char @args");
-		$this->logf(MODE => 'Set +%s on %s.', $char, $target->name);
+		$this->raw($network, 'MODE '.$target->name." +$char @args");
+		$this->logf(MODE => 'Set +%s on %s@%s.', $char, $target->name, $network);
 	}
 	$target->add_mode($char);
 	return $res if $res;
@@ -172,7 +178,7 @@ sub setMode {
 # @user User object to kick
 # @reason Reason to supply
 sub kick {
-	my ($this, $chan, $user, $reason) = @_;
+	my ($this, $network, $chan, $user, $reason) = @_;
 	if(!$user->isa('user'))
 	{
 		$this->logf(WARN => 'kick(): Invalid target "%s" - can only kick users.', $user);
@@ -184,7 +190,7 @@ sub kick {
 		return;
 	}
 	$reason ||= 'no reason';
-	my $res = $this->hook_run(OnBotPreKick => $chan, $user, $reason);
+	my $res = $this->hook_run(OnBotPreKick => $network, $chan, $user, $reason);
 	
 	if($res)
 	{
@@ -194,8 +200,8 @@ sub kick {
 			return $res;
 		}
 	}
-	$this->raw('KICK '.$chan->name.' '.$user->nick." :$reason");
-	$this->hook_run(OnBotKick => $chan, $user, $reason);
+	$this->raw($network, 'KICK '.$chan->name.' '.$user->nick." :$reason");
+	$this->hook_run(OnBotKick => $network, $chan, $user, $reason);
 	return $res if $res;
 }
 
