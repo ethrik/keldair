@@ -11,10 +11,10 @@ $keldair->help_add(EVAL => 'Evaluates a Perl expression.');
 $keldair->syntax_add(EVAL => 'EVAL <expression>');
 
 $keldair->command_bind(EVAL => sub {
-        my ($chan, $dst, @expr) = @_;
+        my ($network, $chan, $dst, @expr) = @_;
         if(!defined $expr[0])
         {
-            $keldair->msg($chan, "Syntax: \002EVAL\002 <expression>");
+            $keldair->msg($network,$chan, "Syntax: \002EVAL\002 <expression>");
             return;
         }
 
@@ -22,10 +22,10 @@ $keldair->command_bind(EVAL => sub {
         my $result = eval $expr;
         my $error = $@ if $@;
         $result =~ s/(\n|\r|\0)/ /g if (defined $result and $result =~ /(\n|\r|\0)/);
-        $keldair->msg($chan, $result) if defined $result;
+        $keldair->msg($network,$chan, $result) if defined $result;
         $error =~ s/(\n|\r|\0)/ /g if (defined $error and $error =~ /(\n|\r|\0)/);
-        $keldair->msg($chan,$error) if $error;
-        $keldair->msg($chan, 'Done.');
+        $keldair->msg($network,$chan,$error) if $error;
+        $keldair->msg($network,$chan, 'Done.');
     }
 );
 
