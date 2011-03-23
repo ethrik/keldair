@@ -11,7 +11,7 @@ our @EXPORT = qw($keldair &HOOK_DENY &HOOK_PASS &HOOK_DENY_EAT &HOOK_PASS_EAT &T
 
 our (%V) = (
     'MAJOR' => 3,
-    'MINOR' => 7,
+    'MINOR' => 8,
     'PATCH' => 2,
 );
 
@@ -20,14 +20,16 @@ our $keldair = Class::Keldair->new();
 
 $keldair->hook_add(OnPreConnect => sub {
 	my $network = shift;
-	$keldair->raw($network, "PASS ".$keldair->config("servers/$network/password")) if $keldair->config("servers/$network/password");
-	$keldair->raw($network, "USER ".$keldair->ident.' '.hostname.' '.$keldair->config("servers/$network/address")." :".$keldair->realname);
-	$keldair->raw($network, "NICK ".$keldair->nick);
+	$keldair->raw($network, "PASS ".$keldair->config("networks/$network/server/password")) if $keldair->config("networks/$network/password");
+	$keldair->raw($network, "USER ".$keldair->config("networks/$network/keldair/ident").' '.hostname.' '.$keldair->config("networks/$network/server/host")." :".$keldair->config("networks/$network/keldair/realname");
+	$keldair->raw($network, "NICK ".$keldair->config("networks/$network/keldair/nick");
 });
 
 $keldair->hook_add(OnConnect => sub {
 	my $network = shift;
-	$keldair->joinChannel($network, $keldair->home);
+    #$keldair->joinChannel($network, $keldair->config("networks/$network/channels/home);
+    my $channels = $keldair->config("networks/$network/channels");
+    $keldair->joinChannel($network,$_) foreach @{ $channels };
 });
 
 local $SIG{__WARN__} = sub {
