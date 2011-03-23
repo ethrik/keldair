@@ -21,23 +21,23 @@ sub ctcp {
 }
 
 $keldair->hook_add(OnJoin => sub {
-	my ($nick, $chan) = @_;
+	my ($network, $nick, $chan) = @_;
 	$chan =~ s/:// if $chan =~ /^:(#|&|!).*/;
-	$keldair->raw("WHO $chan");
+	$keldair->raw($network, "WHO $chan");
 	
-	my $_chan = Class::Keldair::Channel->new(name => $chan, network => 'TODO');
+	my $_chan = Class::Keldair::Channel->new(name => $chan, network => $network);
 	
 	$keldair->add_chan($chan, $_chan);
 });
 
 $keldair->hook_add(OnRaw352 => sub {
-		my ($chan, $ident, $host, $server, $nick, $flags, $real) = @_;
+		my ($network, $chan, $ident, $host, $server, $nick, $flags, $real) = @_;
 		my $user = Class::Keldair::User->new(
 			nick => $nick,
 			ident => $ident,
 			realname => $ident,
 			host => $host,
-			network => 'TODO',
+			network => $network,
 			server => $server
 		);
 		$keldair->log(STATE => "Adding $nick!$ident\@$host to $chan:Users - Adding $chan to $nick:Channels.");
@@ -48,15 +48,15 @@ $keldair->hook_add(OnRaw352 => sub {
 );
 
 $keldair->hook_add(OnKick => sub {
-	my ($nick, $chan, $target, $reason) = @_;
+	my ($network, $nick, $chan, $target, $reason) = @_;
 	$keldair->find_chan($chan)->del_user($target);
 	$keldair->find_user($target)->del_chan($chan);
-	$keldair->log(STATE => "$target KICKed from $chan - removed $target from $chan:Users - removed $chan from $target:Channels.");	
+	$keldair->log(STATE => "$target KICKed from $chan\@$network - removed $target from $chan:Users - removed $chan from $target:Channels.");	
 });
 
 $keldair->hook_add(OnPart => sub {
-	my ($nick, $chan) = @_;
-	$keldair->log(STATE => "$nick PARTed from $chan - removed $chan from $nick:Channels - removed $nick from $chan:Users.");	
+	my ($network, $nick, $chan) = @_;
+	$keldair->log(STATE => "$nick PARTed from $chan\@$network - removed $chan from $nick:Channels - removed $nick from $chan:Users.");	
 });
 
 $keldair->hook_add(OnMode => sub {
@@ -64,6 +64,7 @@ $keldair->hook_add(OnMode => sub {
 });
 
 $keldair->hook_add(OnRaw005 => sub {
+	my $network = shift;
 	my $support = shift;
 
 	my @info = split ' ', $support;

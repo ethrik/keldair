@@ -7,12 +7,12 @@ use strict;
 use warnings;
 
 $keldair->hook_add(OnJoin => sub {
-	my ($chan, $nick) = @_;
-	$keldair->msg($chan, "Hi, $nick!") unless $nick eq $keldair->nick;
+	my ($network, $chan, $nick) = @_;
+	$keldair->msg($network, $chan, "Hi, $nick!") unless $nick eq $keldair->nick;
 });
 
 $keldair->hook_add(OnBotPreJoin => sub {
-	my ($chan) = @_;
+	my ($network, $chan) = @_;
 	return HOOK_DENY if $chan eq '#dev';
 });
 

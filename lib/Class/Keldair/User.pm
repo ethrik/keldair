@@ -3,13 +3,6 @@
 package Class::Keldair::User;
 use Mouse;
 
-has 'name' => (
-    isa => 'Str',
-    is => 'ro',
-    required => 0,
-    default => 'PM'
-);
-
 has 'nick' => (
 	isa => 'Str',
 	is => 'rw',
@@ -79,6 +72,11 @@ has 'modes' => (
 sub isa {
 	my ($this, $isa) = @_;
 	return 1 if $isa eq 'user';
+}
+
+sub name {
+	my $this = shift;
+	return $this->nick;
 }
 
 1;

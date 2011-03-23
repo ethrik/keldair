@@ -9,7 +9,7 @@ my (%commands, %_commands);
 
 %commands = (
 	NOTICE => sub {
-		my ($this, $origin, $cmd, $target, @msg) = @_;
+		my ($this, $network, $origin, $cmd, $target, @msg) = @_;
 		
 		my $m = shift @msg;
 		$m = substr $m, 1;
@@ -18,9 +18,10 @@ my (%commands, %_commands);
 		my $nick = (split /!/, $origin, 1)[0]; # just in case the server allowed the origin to have more than 1 '!' in the hostmask
 		$nick = substr $nick, 1;
 
+        my $message = join(' ', @msg );
 		if($nick)
 		{
-			$this->hook_run(OnNotice => $nick, $target, @msg);
+			$this->hook_run(OnNotice => $network, $nick, $target, $message);
 		}
 		## Potential Bug
 		# If the bot cannot find the nick by the '!', it will assume server notice
@@ -28,37 +29,37 @@ my (%commands, %_commands);
 		else
 		{
 			my $servname = substr $origin, 1;
-			$this->hook_run(OnServerNotice => $servname, $target, @msg);
+			$this->hook_run(OnServerNotice => $network, $servname, $target, $message);
 		}
 	},
 	PRIVMSG => sub {
-		# R: :miniCruzer!sam@usr-bin-perl.use-strict.use-warnings PRIVMSG #dev :hot
-        my ($this, $origin, $cmd, $target, @msg) = @_;
+        my ($this, $network, $origin, $cmd, $target, @msg) = @_;
 		my $m = shift @msg;
 		$m = substr $m, 1;
 		unshift @msg, $m;
 
 		my $nick = (split /!/, $origin)[0];
 		$nick = substr $nick, 1;
-        $this->hook_run(OnMessage => $target, $nick, @msg);
+        my $message = join(' ', @msg);
+        $this->hook_run(OnMessage => $network, $target, $nick, $message);
 	},
 	JOIN => sub {
-		my ($this, $origin, $cmd, $chan) = @_;
+		my ($this, $network, $origin, $cmd, $chan) = @_;
 		my $nick = nick_from_host($origin);
-		$this->hook_run(OnJoin => $nick, $chan);
+		$this->hook_run(OnJoin => $network, $nick, $chan);
 	},
 	PART => sub {
-		my ($this, $origin, $cmd, $chan) = @_;
+		my ($this, $network, $origin, $cmd, $chan) = @_;
 		my $nick = nick_from_host($origin);
-		$this->hook_run(OnPart => $nick, $chan);
+		$this->hook_run(OnPart => $network, $nick, $chan);
 	},
 	KICK => sub {
-		my ($this, $origin, $cmd, $chan, $target, @reason) = @_;
+		my ($this, $network, $origin, $cmd, $chan, $target, @reason) = @_;
 		my $nick = nick_from_host($origin);
-		$this->hook_run(OnKick => $nick, $chan, $target, (join ' ', @reason));
+		$this->hook_run(OnKick => $network, $nick, $chan, $target, (join ' ', @reason));
 	},
 	MODE => sub {
-		my ($this, $origin, $cmd, $target, $modemask, @args) = @_;
+		my ($this, $network, $origin, $cmd, $target, $modemask, @args) = @_;
 		my $nick = nick_from_host($origin);
 
 		my (@chars, @adding, @removing, $set);
@@ -103,34 +104,34 @@ my (%commands, %_commands);
 				$this->log(PARSER => "Could not find user $target - not an object!");
 			}
 		}
-		$this->hook_run(OnMode => $nick, $target, $modemask, @args);
+		$this->hook_run(OnMode => $network, $nick, $target, $modemask, @args);
 	},
 	'001' => sub {
-		my ($this, $server, @welcome) = @_;
-		$this->hook_run(OnConnect => $server, @welcome);
+		my ($this, $network, $server, @welcome) = @_;
+		$this->hook_run(OnConnect => $network, $server, @welcome);
 	},
 	'352' => sub {
 		# :slipknot.woomoo.org 352 Keldair #dev sam usr-bin-perl.use-strict.use-warnings slipknot.woomoo.org miniCruzer H*! :0 Only One
-		my ($this, $origin, $numeric, $me, $chan, $ident, $host, $server, $nick, $flags, @real) = @_;
+		my ($this, $network, $origin, $numeric, $me, $chan, $ident, $host, $server, $nick, $flags, @real) = @_;
 		my $r = shift @real;
 		$r = substr $r, 1;
 		unshift @real, $r;
 		my $real = join ' ', @real;	
 		
-		$this->hook_run(OnRaw352 => $chan, $ident, $host, $server, $nick, $flags, $real);
+		$this->hook_run(OnRaw352 => $network, $chan, $ident, $host, $server, $nick, $flags, $real);
 	},
 	'005' => sub {
-		my ($this, $origin, $num, $me, @support) = @_;
+		my ($this, $network, $origin, $num, $me, @support) = @_;
 		my $support = join ' ', @support;
 		
-		$this->hook_run(OnRaw005 => $support);
+		$this->hook_run(OnRaw005 => $network, $support);
 	}
 );
 
 %_commands = (
 	PING => sub {
-		my ($this, $cmd, $str) = @_;
-		$this->raw("PONG $str");
+		my ($this, $network, $cmd, $str) = @_;
+		$this->raw($network, "PONG $str");
 	}
 );
 
@@ -139,7 +140,8 @@ my (%commands, %_commands);
 # @line \n-Terminated line from the server
 sub parse {
 	my ($this, $network, $line) = @_;
-	$this->log(WARN => 'parse(): Did not get an IRC line when called!', 1) if !$line;
+	my $class = caller;
+	$this->log(WARN => "parse(): Did not get an IRC line when called! (called by: $class", 1) if !$line;
 	my @s = split / /, $line;
 	
 	if(exists $commands{uc($s[1])})

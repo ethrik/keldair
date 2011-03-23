@@ -7,14 +7,25 @@ use IO::Socket::IP;
 use Module::Load;
 use Keldair;
 use FindBin qw($Bin);
+use Class::Keldair::Connections;
 
 with 'Class::Keldair::Parser', 'Class::Keldair::Interface', 'Class::Keldair::Commands';
 
-# soemone will probably want to move this to a different location later...
+my $manager = Class::Keldair::Connections->new;
+
+# someone will probably want to move this to a different location later...
 my $conf = "$Bin/../etc/keldair.conf";
 $conf = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
-my $config = Config::JSON->new($conf);
-our $socket;
+
+## conf
+# Object to Config::JSON - uses all methods from this package,
+# and is already pointed to default config.
+has 'conf' => (
+	is => 'rw',
+	isa => 'Object',
+	default => sub { new Config::JSON($conf) },
+	required => 1
+);
 
 ## nick(str)
 # Nickname to register with - this may be truncated depending on length limit on server.
@@ -23,7 +34,10 @@ has 'nick' => (
 	isa => 'Str',
 	is => 'rw',
 	required => 1,
-	default => $config->get('keldair/nick')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/nick');
+	}
 );
 
 ## ident(str)
@@ -33,7 +47,10 @@ has 'ident' => (
 	isa => 'Str',
 	is => 'rw',
 	required => 1,
-	default => $config->get('keldair/ident')
+	default => sub {
+		my $this = shift;	
+		$this->conf->get('keldair/ident');
+	}
 );
 
 ## realname(str)
@@ -43,45 +60,10 @@ has 'realname' => (
 	isa => 'Str',
 	required => 1,
 	is => 'rw',
-	default => $config->get('keldair/realname')
-);
-
-## server(str)
-# Server address to connect to
-# @default Finds the server address from keldair.conf
-has 'server' => (
-	isa => 'Str',
-	is => 'rw',
-	required => 1,
-	default => $config->get('server/address')
-);
-
-## port(int)
-# Connect to the server over this numeric port
-# @defualt Uses port value in keldair.conf
-has 'port' => (
-	isa => 'Int',
-	is => 'rw',
-	required => 1,
-	default => $config->get('server/port')
-);
-
-## usessl(int)
-# Connect over Secure Socket Layers to the server
-# @default Retrieves value from the config in 1/0 - True/False format
-has 'usessl' => (
-	isa => 'Int',
-	is => 'rw',
-	default => $config->get('server/usessl')
-);
-
-## debug(int)
-# Print IRC Input / Output between client and server
-# @default Configuration value
-has 'debug' => (
-	isa => 'Int',
-	is => 'rw',
-	default => $config->get('keldair/debug')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/realname');
+	}
 );
 
 ## home(str)
@@ -90,7 +72,22 @@ has 'debug' => (
 has 'home' => (
 	isa => 'Str',
 	is => 'rw',
-	default => $config->get('keldair/home')
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/home');
+	}
+);
+
+## debug(int)
+# Print IRC Input / Output between client and server
+# @default Configuration value
+has 'debug' => (
+	isa => 'Int',
+	is => 'rw',
+	default => sub {
+		my $this = shift;
+		$this->conf->get('keldair/debug');
+	}
 );
 
 ## hooks { }
@@ -199,7 +196,13 @@ sub hook_run {
 # TODO: Turn this into the actual Config::JSON package (ie: $keldair->config->get(...), and $keldair->config->set(...)
 sub config {
 	my ($this, $directive) = @_;
-	return $config->get($directive);
+	return $this->conf->get($directive);
+}
+
+## manager()
+# Returns the manager instance
+sub manager {
+	return $manager;
 }
 
 ## log(str, str, int)
@@ -231,52 +234,61 @@ sub logf {
 
 	my $msg = sprintf shift @_, @_;
 
-	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
+	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->conf->get('keldair/log')." for logging. $!\n";
 	my $logtime = localtime;
 	print {$fh} "[$logtime] $level: $msg\n";
 	close $fh;
 }
 
-## connect()
-# Connect Keldair to the IRC server. Program will close if there an error after logging.
-# @return Returns socket object indicating that the connection was successful.
-# TODO: Bind to a host
-sub connect {
-	my ($this) = @_;
-	
-	if($this->usessl)
-	{
-		require IO::Socket::SSL;
-		$socket = IO::Socket::SSL->new(
-			PeerAddr => $this->server,
-			PeerPort => $this->port,
-			Proto => 'tcp',
-			Timeout => 30,
-			SSL_use_cert => 1,
-			SSL_key_file => $config->get('keldair/key'),
-			SSL_cert_file => $config->get('keldair/cert'),
-			SSL_passwd_cb =>  sub { return $config->get('keldair/key_passwd') }
-		) || $this->log(WARN => "Could not connect to IRC! $!", 1);
-	}
-	else
-	{
-		$socket = IO::Socket::IP->new(
-			PeerAddr => $this->server,
-			PeerPort => $this->port,
-			Proto => 'tcp',
-			Timeout => 30
-		) || $this->log(WARN => "Could not connect to IRC! $!", 1);	
-	}
-
-	$this->log(INFO => 'Connected to IRC successfully.');
-	return $socket;
-}
-
 sub modload {
 	my ($this, $module) = @_;
-	eval { load 'Keldair::Module::'.$module; } or return $@;
+	my $class = caller;
+	
+	my $res = $this->hook_run(OnPreModLoad => $module);
+	
+	if($res < 0)
+	{
+		$this->log(HOOK_EATEN => "OnPreModLoad: Not loading $module; stopped by $class.");
+		return 0;
+	}
+
+	my $modr = $module;
+	$modr =~ s#::#/#g;
+	$modr .= '.pm';	
+
+	if(-e "Keldair/Module/$modr")
+	{
+				
+		if(eval{
+			load 'Keldair::Module::'.$module;
+			1;
+		}) {
+			$this->log(MODLOAD => "Successfully loaded $module.");
+		} else {
+			$this->log(WARN => "Could not load $module! $@");
+			return 0;
+		}
+	} else {
+		$this->logf(MODLOAD => 'Cannot find "%s" in Keldair::Module, searching in @INC.', $module);
+		if(-e $modr)
+		{
+			if(eval{
+				load $module;
+				1;
+			}) {
+				$this->log(MODLOAD => "Successfully loaded $module, but it was found outside of Keldair::Module. Consider moving it...");
+			} else {
+				$this->log(WARN => "Could not load $module! $!");
+				return 0;
+			}
+		} else {
+			$this->log(WARN => "Could not load $module! Not found in Keldair::Module or in \@INC.");
+			return 0;
+		}
+	}
 	return 1;
 }
+
 
 # TODO: Turn CTCP into a hashref trait like hooks, etc., unless its not possible
 sub ctcp_add {

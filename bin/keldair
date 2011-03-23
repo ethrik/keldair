@@ -6,6 +6,7 @@ use warnings;
 use FindBin qw($Bin);
 use POSIX qw(BUFSIZ);
 use Getopt::Long;
+use Config::JSON;
 use feature qw(say);
 my $pid = $$;
 
@@ -24,13 +25,15 @@ BEGIN
 
 use Keldair;
 use Keldair::CoreCommands;
+use Keldair::Module::Help;
 use Keldair::State;
-use Class::Keldair::Connections;
+use Keldair::Module::Alias;
 
 our ($dbug, $cfile);
-GetOptions("debug!" => \$dbug, "config=s" => \&cfile);
+GetOptions("debug!" => \$dbug, "config=s" => \$cfile);
 $keldair->debug($dbug) if defined $dbug;
 $cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
+$keldair->conf(Config::JSON->new($cfile));
 
 open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
@@ -40,28 +43,36 @@ fork and exit unless $^O eq 'MSWin32' or $keldair->debug; # This cannot be compr
 our $VERSION = $Keldair::VERSION;
 
 our %STATS;
+$STATS{'start'} = time;
 
 my $modules = $keldair->config('modules');
 $keldair->modload($_) foreach @{ $modules };
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
+my $manager = $keldair->manager;
 
-#my $sock = $keldair->connect();
-#$keldair->hook_run('OnPreConnect');
+foreach (keys %{ $keldair->config('servers') }) {
+	if ($keldair->config("servers/$_/autoconnect")) {
+		$keldair->manager->add(name => $_, addr => $keldair->config("servers/$_/address"), port => $keldair->config("servers/$_/port"));
+	}
+}
+
 while (1) {
-    foreach my $sock ($manager->{selector}->can_read(1)) {
+    foreach my $sock ($keldair->manager->{selector}->can_read(1)) {
         my $network;
-        foreach (keys %{$manager->{sockets}}) {
-            if ($manager->{sockets}->{$_} eq $sock) { $network = $_; }
-            my $buffer;
-            recv $sock, $buffer, BUFSIZ, 0;
-            while ($buffer =~ s/(.*\n)//) {
-                my $line = $1;
-                $STATS{'inB'} += length($line);
-                $line =~ s/(\r\n)//g;
-                say "<$netname> R: $line" if $keldair->debug;
-                $keldair->parse($network, $line);
-            }
+        foreach (keys %{$keldair->manager->{sockets}}) {
+            if ($keldair->manager->{sockets}->{$_} eq $sock) { $network = $_; }
+	}
+        my $buffer;
+        recv $sock, $buffer, BUFSIZ, 0;
+        while ($buffer =~ s/(.*\n)//) {
+	    $STATS{$network}{'inL'}++;
+	    if ($STATS{$network}{'inL'} == 1) { $keldair->hook_run('OnPreConnect' => $network); }
+            my $line = $1;
+            $STATS{'inB'} += length($line);
+            $line =~ s/(\r\n)//g;
+            say "<$network> R: $line" if $keldair->debug;
+            $keldair->parse($network, $line);
         }
     }
 }
@@ -70,17 +81,17 @@ while (1) {
 
 # Kill the first PID we had
 # I think that by saying 'local', we do not recieve the desired effect here ... - miniCruzer
-local $SIG{CHLD} = sub {
+$SIG{CHLD} = sub {
     print "CHLD - KILLING $pid\n";
     kill(TERM => $pid);
 };
 
-local $SIG{TERM} = sub {
+$SIG{TERM} = sub {
     $keldair->quit('Caught SIGTERM, exiting.');
     $keldair->log(INFO => 'Caught SIGTERM, exiting.', 1);
 };
 
-local $SIG{INT} = sub {
+$SIG{INT} = sub {
     $keldair->quit('Caught SIGINT, exiting.');
     $keldair->log(INFO => 'Caugt SIGINT, exiting.', 1);
 };
