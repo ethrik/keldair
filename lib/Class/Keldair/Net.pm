@@ -39,20 +39,6 @@ has 'network' => (
 	required => 1
 );
 
-has 'channels' => (
-        traits => ['Hash'],
-        is => 'ro',
-        isa => 'HashRef[Object]',
-        default => sub { {} },
-        handles => {
-                add_chan => 'set',
-                is_in => 'get',
-                no_chans => 'is_empty',
-                del_chan => 'delete',
-                chan_pairs => 'kv'
-        }
-);
-
 has 'modes' => (
 	traits => ['Hash'],
 	is => 'ro',
