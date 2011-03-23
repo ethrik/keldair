@@ -1,5 +1,6 @@
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
+# This file represents one network at a time. Create a new object for each network.
 package Class::Keldair::Net;
 use Mouse;
 
