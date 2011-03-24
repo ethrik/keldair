@@ -21,7 +21,7 @@ our $keldair = Class::Keldair->new();
 $keldair->hook_add(OnPreConnect => sub {
 	my $network = shift;
 	$keldair->raw($network, "PASS ".$keldair->config("networks/$network/server/password")) if $keldair->config("networks/$network/password");
-	$keldair->raw($network, "USER ".$keldair->config("networks/$network/keldair/ident").' '.hostname.' '.$keldair->config("networks/$network/server/host")." :".$keldair->config("networks/$network/keldair/realname"));
+	$keldair->raw($network, "USER ".$keldair->config("networks/$network/keldair/ident").' '.hostname.' '.$keldair->config("networks/$network/server/host")." :".$keldair->config("networks/$network/keldair/name"));
 	$keldair->raw($network, "NICK ".$keldair->config("networks/$network/keldair/nick"));
 });
 

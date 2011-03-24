@@ -42,14 +42,10 @@ $keldair->hook_add(OnMessage => sub {
 
         if($exec_cmd) {
             if ($chan =~ /^(!|#|&)/) {
-                $exec_cmd->($keldair->find_chan($chan), $keldair->find_user($nick), @args);
-            }
-            else {
-                $exec_cmd->($keldair->find_user($chan), $keldair->find_user($nick), @args);
                 $exec_cmd->($network, $keldair->find_chan($chan), $keldair->find_user($nick), @args);
             }
             else {
-                $exec_cmd->($network, $keldair->find_user($chan), $keldair->find_user($nick), @args);
+                $exec_cmd->($network, $keldair->find_chan($chan), $keldair->find_user($nick), @args);
             }
         }
 });
