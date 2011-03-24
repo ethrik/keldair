@@ -45,7 +45,7 @@ $keldair->hook_add(OnMessage => sub {
                 $exec_cmd->($network, $keldair->find_chan($chan), $keldair->find_user($nick), @args);
             }
             else {
-                $exec_cmd->($network, $keldair->find_chan($chan), $keldair->find_user($nick), @args);
+                $exec_cmd->($network, $keldair->find_user($chan), $keldair->find_user($nick), @args);
             }
         }
 });
