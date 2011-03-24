@@ -27,6 +27,7 @@ has 'conf' => (
 	required => 1
 );
 
+=comment
 ## nick(str)
 # Nickname to register with - this may be truncated depending on length limit on server.
 # @default Nick as found in keldair.conf
@@ -77,6 +78,7 @@ has 'home' => (
 		$this->conf->get('keldair/home');
 	}
 );
+=cut
 
 ## debug(int)
 # Print IRC Input / Output between client and server
@@ -86,7 +88,7 @@ has 'debug' => (
 	is => 'rw',
 	default => sub {
 		my $this = shift;
-		$this->conf->get('keldair/debug');
+		$this->conf->get('debug');
 	}
 );
 
@@ -213,7 +215,7 @@ sub manager {
 sub log {
 	# this can be expanded to be more intense later
 	my ($this, $level, $msg, $exit) = @_;
-	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->config('keldair/log')." for logging. $!\n";
+	open my $fh, '>>', $this->config('log') || die "Could not open ".$this->config('log')." for logging. $!\n";
 	my $logtime = localtime;
 	print {$fh} "[$logtime] $level: $msg\n";
 	close $fh;
@@ -234,10 +236,18 @@ sub logf {
 
 	my $msg = sprintf shift @_, @_;
 
-	open my $fh, '>>', $this->config('keldair/log') || die "Could not open ".$this->conf->get('keldair/log')." for logging. $!\n";
+	open my $fh, '>>', $this->config('log') || die "Could not open ".$this->conf->get('log')." for logging. $!\n";
 	my $logtime = localtime;
 	print {$fh} "[$logtime] $level: $msg\n";
 	close $fh;
+}
+
+sub connect {
+	my ($this, $network) = @_;
+	if ($this->conf->get("networks/$network")) {
+		$this->manager->add(name => $network, addr => $this->conf->get("networks/$network/server/host"), port => $this->conf->get("networks/$network/server/port")) and return 1 or return 0;
+	}
+	return;
 }
 
 sub modload {

@@ -51,9 +51,10 @@ $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
 my $manager = $keldair->manager;
 
-foreach (keys %{ $keldair->config('servers') }) {
-	if ($keldair->config("servers/$_/autoconnect")) {
-		$keldair->manager->add(name => $_, addr => $keldair->config("servers/$_/address"), port => $keldair->config("servers/$_/port"));
+foreach (keys %{ $keldair->config('networks') }) {
+	if ($keldair->config("networks/$_/autoconnect")) {
+		say "Connecting to $_...";
+		$keldair->connect($_) or say "Couldn't connect to $_";
 	}
 }
 
