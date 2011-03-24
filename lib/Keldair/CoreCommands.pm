@@ -16,7 +16,7 @@ $keldair->help_add(MODLOAD => 'Load a module in lib/Keldair/Modules/');
 $keldair->hook_add(OnRehash => sub {
 	my $network = shift;
         my $chan = shift;
-        $trigger = $keldair->config('keldair/trigger');
+        $trigger = $keldair->config('trigger');
         $keldair->msg($network, $chan => 'Updating trigger to %s', $trigger) unless !$chan;
         return 0;
 }); 
