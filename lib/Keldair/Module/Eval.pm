@@ -11,14 +11,13 @@ $keldair->help_add(EVAL => 'Evaluates a Perl expression.');
 $keldair->syntax_add(EVAL => 'EVAL <expression>');
 
 $keldair->command_bind(EVAL => sub {
-        my ($network, $chan, $dst, @expr) = @_;
-        if(!defined $expr[0])
+        my ($network, $chan, $dst, $expr) = @_;
+        if(!defined $expr)
         {
             $keldair->msg($network,$chan, "Syntax: \002EVAL\002 <expression>");
             return;
         }
 
-        my $expr = join ' ', @expr;
         my $result = eval $expr;
         my $error = $@ if $@;
         $result =~ s/(\n|\r|\0)/ /g if (defined $result and $result =~ /(\n|\r|\0)/);

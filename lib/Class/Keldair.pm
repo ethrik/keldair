@@ -262,41 +262,27 @@ sub modload {
 		return 0;
 	}
 
-	my $modr = $module;
-	$modr =~ s#::#/#g;
-	$modr .= '.pm';	
-
-	if(-e "Keldair/Module/$modr")
-	{
-				
-		if(eval{
-			load 'Keldair::Module::'.$module;
-			1;
-		}) {
-			$this->log(MODLOAD => "Successfully loaded $module.");
-		} else {
-			$this->log(WARN => "Could not load $module! $@");
-			return 0;
-		}
-	} else {
-		$this->logf(MODLOAD => 'Cannot find "%s" in Keldair::Module, searching in @INC.', $module);
-		if(-e $modr)
-		{
-			if(eval{
-				load $module;
-				1;
-			}) {
-				$this->log(MODLOAD => "Successfully loaded $module, but it was found outside of Keldair::Module. Consider moving it...");
-			} else {
-				$this->log(WARN => "Could not load $module! $!");
-				return 0;
-			}
-		} else {
-			$this->log(WARN => "Could not load $module! Not found in Keldair::Module or in \@INC.");
-			return 0;
-		}
-	}
-	return 1;
+    my $modres = eval {
+        load("Keldair::Module::$module");
+        return 1;
+        0;
+    };
+    if ($modres == 1) {
+        $this->logf(MODLOAD => 'Successfully loaded %s from Keldair::Module.', $module);
+        return 1;
+    }
+    else {
+        my $_modres = eval {
+            load($module);
+            return 1;
+            0;
+        };
+        if ($_modres == 1) {
+            $this->logf(MODLOAD => 'Successfully loaded %s - consider moving it to: lib/Keldair/Module.', $module);
+            return 1;
+        }
+    }
+    $this->logf(MODLOAD => 'Failed to load %s. Error: %s', $module, $@);
 }
 
 

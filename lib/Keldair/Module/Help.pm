@@ -11,7 +11,8 @@ $keldair->syntax_add(HELP => 'HELP <command>');
 
 $keldair->command_bind(HELP =>
     sub {
-        my ($network, $chan, $nick, @parv) = @_;
+        my ($network, $chan, $nick, $string) = @_;
+        my @parv = split(' ', $string);
         if ($parv[0]) { 
             if ($keldair->help_get(uc($parv[0]))) {
                 $keldair->msg($network,$chan,'Help for %s: %s', uc($parv[0]), $keldair->help_get(uc($parv[0]))); 
