@@ -28,8 +28,6 @@ use Keldair::CoreCommands;
 use Keldair::Module::Help;
 use Keldair::State;
 use Class::Keldair::Connections;
-use Keldair::Module::Alias;
-use Keldair::Module::Account;
 
 our ($dbug, $cfile);
 GetOptions("debug!" => \$dbug, "config=s" => \$cfile);
