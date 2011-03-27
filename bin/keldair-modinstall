@@ -12,7 +12,7 @@ use Furl;
 
 our $VERSION = '0.1.1';
 
-GetOptions( 'i=s' => \my $option_i, 's=s' => \my $option_s, 'v' => \my $option_v, 'h' => \my $option_h ) or exit(1);
+GetOptions( 'i=s' => \my $option_i, 's=s' => \my $option_s, 'v' => \my $option_v, 'h' => \my $option_h, 'l' => \my $option_l ) or exit(1);
 
 
 if ($option_v) { print <<ENDVER;
@@ -31,6 +31,7 @@ Usage: $0 -[v|h|i [argument]]
    -v	Returns the modmanage version.
    -h	Returns this help message.
    -i	Installs the Keldair module specified in the argument.
+   -l   Lists all available modules.
    -s   Searches for the pattern specified by the regex in the argument.
 
 ENDHELP
@@ -91,4 +92,12 @@ if ($option_s) {
 	foreach my $mod (@modules) { say $mod if $mod =~ $search; }
 }
 
-
+if ($option_l) {
+    my $furl = Furl->new(
+        agent => "KeldairModinstall/$VERSION",
+        timeout => 10
+    );
+    my $res = $furl->get('https://github.com/ethrik/kmods/raw/master/LIST');
+    die $res->status_line unless $res->is_success;
+    print $res->content;
+}

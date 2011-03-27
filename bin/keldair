@@ -40,8 +40,7 @@ fork and exit unless $^O eq 'MSWin32' or $keldair->debug; # This cannot be compr
 
 our $VERSION = $Keldair::VERSION;
 
-our %STATS;
-$STATS{'start'} = time;
+$Keldair::State::STATS{'start'} = time;
 
 my $modules = $keldair->config('modules');
 $keldair->modload($_) foreach @{ $modules };
@@ -65,11 +64,11 @@ while (1) {
         my $buffer;
         recv $sock, $buffer, BUFSIZ, 0;
         while ($buffer =~ s/(.*\n)//) {
-	    $STATS{$network}{'inL'}++;
-	    if ($STATS{$network}{'inL'} == 1) { $keldair->hook_run('OnPreConnect' => $network); }
+	    $Keldair::State::STATS{$network}{'inL'}++;
+	    if ($Keldair::State::STATS{$network}{'inL'} == 1) { $keldair->hook_run('OnPreConnect' => $network); }
             my $line = $1;
-            $STATS{'inB'} += length($line);
-            $STATS{$network}{'inB'} += length($line);
+            $Keldair::State::STATS{'inB'} += length($line);
+            $Keldair::State::STATS{$network}{'inB'} += length($line);
             $line =~ s/(\r\n)//g;
             say "<$network> R: $line" if $keldair->debug;
             $keldair->parse($network, $line);
