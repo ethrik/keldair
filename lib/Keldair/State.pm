@@ -10,6 +10,8 @@ use Class::Keldair::User;
 
 my (%isupport, %ctcp);
 
+our %STATS;
+
 sub ctcp { 
 	my ( $self, $method, $type, $response ) = @_;
 	if ( $method eq 'add' ) {

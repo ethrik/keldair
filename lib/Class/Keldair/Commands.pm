@@ -37,6 +37,8 @@ sub raw {
 		}
 	}
        $this->manager->write($network, $dat);
+       $Keldair::State::STATS{$network}{'outB'} += (length($dat) + 2);
+       $Keldair::State::STATS{'outB'} += (length($dat) + 2);
        print "<$network> S: $dat\n" if $this->debug;
 }
 
