@@ -56,36 +56,4 @@ $keldair->command_bind(DIE => sub {
 	exit 0;
 });
 
-$keldair->command_bind(RESTART => sub {
-	my ($network, $chan, $dst, $reason) = @_;
-
-	system "$Bin/keldair";
-
-	$keldair->quit($network, $reason);
-	$keldair->logf(INFO => 'Restarting by request of %s from %s@%s.', $dst->nick, $chan->name, $network);
-
-	exit 0;
-});
-
-$keldair->command_bind(REHASH => sub {
-	my ($network, $chan, $dst) = @_;
-
-	$keldair->hook_run(OnRehash => $network, $chan, $dst);
-	$keldair->msg($chan, 'Rehashing keldair.conf.');
-	$keldair->logf(INFO => '%s is rehashing keldair.conf.', $dst->nick);
-});
-
-$keldair->command_bind(MODLOAD => sub {
-	my ($network, $chan, $dst, $file) = @_;
-	my $res = $keldair->modload($file);
-	if($res == 1)
-	{
-		$keldair->msg($network, $chan, '%s: Loaded %s successfully.', $dst->nick, $file);
-	} else
-	{
-		$keldair->msg($network, $chan, '%s: Could not load %s!', $dst->nick, $file);
-	}
-
-});
-   
 1;
