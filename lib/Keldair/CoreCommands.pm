@@ -30,8 +30,6 @@ $keldair->hook_add(OnMessage => sub {
 
         my $_trigger = substr $msg, 0, (length $trigger);
 
-        return 0 unless $trigger eq $_trigger;
-
         my $trig_and_cmd = length($cmd) + length($trigger);
         my $args = substr $msg, $trig_and_cmd;
         my @args = split ' ', $args;
