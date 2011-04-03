@@ -23,3 +23,7 @@ Please DON'T modify the existing code style (Don't run code through `perltidy`, 
 Thank you for following our humble requests, happy hacking!
 
 =cut
+
+=head3 MENTIONS
+
+Thanks to Cory Smelosky (gewt), author of b4bot, who we borrowed some module ideas from.
