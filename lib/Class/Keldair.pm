@@ -245,7 +245,9 @@ sub logf {
 sub connect {
 	my ($this, $network) = @_;
 	if ($this->conf->get("networks/$network")) {
-		$this->manager->add(name => $network, addr => $this->conf->get("networks/$network/server/host"), port => $this->conf->get("networks/$network/server/port")) and return 1 or return 0;
+		$this->manager->add(name => $network, addr => $this->conf->get("networks/$network/server/host"), port => $this->conf->get("networks/$network/server/port"),
+            bind => (defined $this->conf->get("networks/$network/server/vhost") ? $this->conf->get("networks/$network/server/vhost") : '0.0.0.0') ) 
+            and return 1 or return 0;
 	}
 	return;
 }
