@@ -27,7 +27,6 @@ $keldair->hook_add(OnMessage => sub {
         if ($msg =~ /^$trig/) {
             my $cmd = substr $msg, length $trigger;
             $cmd = (split ' ', $cmd)[0];
-            return 0 if !defined $cmd;
 
             my $_trigger = substr $msg, 0, (length $trigger);
 
@@ -45,6 +44,9 @@ $keldair->hook_add(OnMessage => sub {
                     $exec_cmd->($network, $keldair->find_user($chan), $keldair->find_user($nick), $args);
                 }
             }
+        }
+        else {
+            next;
         }
     });
 
