@@ -21,7 +21,7 @@ sub add {
 	my ($self, %params) = @_;
 	return 0 if (!defined $params{name} or !defined $params{addr} or !defined $params{port});
 	return 0 if defined $self->{sockets}->{$params{name}};
-	$self->{sockets}->{$params{name}} = IO::Socket::IP->new(Proto => 'tcp', PeerAddr => $params{addr}, PeerPort => $params{port}, Timeout => (defined $params{timeout} ? $params{timeout} : 30), LocalHost => (defined $params{bind} ? $params{bind} : '0.0.0.0' ) or say("ERROR: $@") and return 0;	
+	$self->{sockets}->{$params{name}} = IO::Socket::IP->new(Proto => 'tcp', PeerAddr => $params{addr}, PeerPort => $params{port}, Timeout => (defined $params{timeout} ? $params{timeout} : 30), LocalHost => (defined $params{bind} ? $params{bind} : '0.0.0.0' ) ) or say("ERROR: $@") and return 0;	
 	$self->{selector}->add($self->{sockets}->{$params{name}}) and return $self->{sockets}->{$params{name}} or say("ERROR: $!") and return 0;
 	return;
 }
