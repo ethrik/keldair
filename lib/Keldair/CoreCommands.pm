@@ -23,7 +23,8 @@ $keldair->hook_add(OnRehash => sub {
 
 $keldair->hook_add(OnMessage => sub {
         my ($network, $chan, $nick, $msg) = @_;
-        if ($msg =~ /^$trigger/) {
+        my $trig = quotemeta($trigger);
+        if ($msg =~ /^$trig/) {
             my $cmd = substr $msg, length $trigger;
             $cmd = (split ' ', $cmd)[0];
             return 0 if !defined $cmd;
