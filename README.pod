@@ -18,7 +18,7 @@ Your example.conf is found in etc/. Rename it to keldair.conf before starting.
 =head2 PREREQUIREMENTS
 
 You need the following module from CPAN: Config::JSON, IO::Socket::IP, IO::Socket::SSL (Only if you want SSL), 
-Mouse, Mouse::Meta::Attribute::Custom::Trait::Hash
+Mouse, Mouse::Meta::Attribute::Custom::Trait::Hash, and Furl (For multiple modules, and keldair-modinstall).
 
 =head3 STYLE
 
