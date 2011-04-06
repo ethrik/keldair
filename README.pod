@@ -15,6 +15,11 @@ Your example.conf is found in etc/. Rename it to keldair.conf before starting.
 
 =cut
 
+=head2 PREREQUIREMENTS
+
+You need the following module from CPAN: Config::JSON, IO::Socket::IP, IO::Socket::SSL (Only if you want SSL), 
+Mouse, Mouse::Meta::Attribute::Custom::Trait::Hash
+
 =head3 STYLE
 
 For those thinking of committing code to Keldair, we have a few, rather basic, requests.
