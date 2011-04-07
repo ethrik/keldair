@@ -4,10 +4,11 @@
 package Keldair;
 use strict;
 use warnings;
+use FindBin qw($Bin);
 use Class::Keldair;
 use Sys::Hostname;
 use base 'Exporter';
-our @EXPORT = qw($keldair &HOOK_DENY &HOOK_PASS &HOOK_DENY_EAT &HOOK_PASS_EAT &TIMER_ONCE &TIMER_REPEAT);
+our @EXPORT = qw($keldair $database &HOOK_DENY &HOOK_PASS &HOOK_DENY_EAT &HOOK_PASS_EAT &TIMER_ONCE &TIMER_REPEAT);
 
 our (%V) = (
     'MAJOR' => 3,
@@ -18,6 +19,13 @@ our (%V) = (
 our $VERSION = "$V{MAJOR}.$V{MINOR}.$V{PATCH}";
 our $keldair = Class::Keldair->new();
 
+my $db = $keldair->conf->get('database');
+if (!$db || -w $db) {
+    $db = "$Bin/../etc/keldair.db";
+}
+Config::JSON->create($db) if (-w $db);
+our $database = Config::JSON->new($db)
+;
 $keldair->hook_add(OnPreConnect => sub {
 	my $network = shift;
 	$keldair->raw($network, "PASS ".$keldair->config("networks/$network/server/password")) if $keldair->config("networks/$network/server/password");
@@ -48,6 +56,7 @@ local $SIG{__DIE__} = sub {
 	}
 };
 
+# Define constants for hooks.
 sub HOOK_PASS () { 1; } # Allow action to proceed.
 sub HOOK_DENY () { 2; } # Do not allow action to proceed.
 sub HOOK_DENY_EAT () { -2; } # Do not allow action to proceed, and eat event.
