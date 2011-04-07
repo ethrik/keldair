@@ -79,7 +79,6 @@ while (1) {
 #$keldair->hook_run('OnDisconnect');
 
 # Kill the first PID we had
-# I think that by saying 'local', we do not recieve the desired effect here ... - miniCruzer
 $SIG{CHLD} = sub {
     print "CHLD - KILLING $pid\n";
     kill(TERM => $pid);
