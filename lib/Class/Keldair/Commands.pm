@@ -11,7 +11,7 @@ sub joinChannel {
 	my ($this, $network, $chan) = @_;
 	if($this->hook_run(OnBotPreJoin => $this->find_chan($chan)) < 0)
 	{
-		$this->log(HOOK_DENY => "Stopped ".caller." from joining $chan\@\$network.");
+		$this->log(HOOK_DENY => "Stopped ".caller()." from joining $chan\@\$network.");
 		return 0;
 	}
 	$this->raw($network, "JOIN $chan");
@@ -32,7 +32,7 @@ sub raw {
 	{
 		if($res == 2 || $res == -2)
 		{
-			$this->log(HOOK_DENY => caller.' denied OnBotPreRaw.');
+			$this->log(HOOK_DENY => caller().' denied OnBotPreRaw.');
 			return $res;
 		}
 	}
@@ -59,7 +59,7 @@ sub msg {
 	{
 		if($res == 2 || $res == -2)
 		{
-			$this->log(HOOK_DENY => "Stopped ".caller." from sending PRIVMSG to $target\@$network with '$msg'.");
+			$this->log(HOOK_DENY => "Stopped ".caller()." from sending PRIVMSG to $target\@$network with '$msg'.");
 			return $res;
 		}
 	}
@@ -106,7 +106,7 @@ sub quit {
 	$reason ||= "leaving";
 	if($this->hook_run(OnBotPreQuit => $network, $reason))
 	{
-		$this->log(HOOK_DENY => "Stopped ".caller." from QUIT on $network with '$reason'.");
+		$this->log(HOOK_DENY => "Stopped ".caller()." from QUIT on $network with '$reason'.");
 		return 0;
 	}
 	$this->raw($network, "QUIT :$reason");
