@@ -91,7 +91,12 @@ $keldair->hook_add(OnNick => sub {
     my ($net, $user, $nick) = @_;
     $keldair->logf(INFO => '%s changed nick to %s, updating in State.pm.', $user->nick, $nick);
     $user->nick($nick);
+    $keldair->del_user($user);
+    
+    $keldair->add_user($nick => $user);
+
     return 0;
+
 });
 
 1;
