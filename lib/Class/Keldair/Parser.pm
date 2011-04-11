@@ -8,9 +8,23 @@ use warnings;
 my (%commands, %_commands);
 
 %commands = (
+    NICK => sub {
+        my ($this, $net, $origin, $cmd, $newnick) = @_;
+        
+        $newnick = substr $newnick, 1;
+        $origin = nick_from_host($origin);
+
+        $this->log(DEBUG => "$origin changed nick to $newnick, running OnNick.");
+
+        $this->hook_run(OnNick =>
+            $net,
+            $this->find_user($origin),
+            $newnick
+        );
+    },
 	NOTICE => sub {
 		my ($this, $network, $origin, $cmd, $target, @msg) = @_;
-		
+	
 		my $m = shift @msg;
 		$m = substr $m, 1;
 		unshift @msg, $m;
