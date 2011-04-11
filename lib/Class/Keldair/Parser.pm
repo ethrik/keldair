@@ -125,7 +125,13 @@ my (%commands, %_commands);
 		my $support = join ' ', @support;
 		
 		$this->hook_run(OnRaw005 => $network, $support);
-	}
+	},
+    INVITE => sub {
+        my ($this, $net, $origin, $cmd, $me, $chan) = @_;
+        $chan = substr $chan, 1;
+
+        $this->hook_run(OnInvite => $this->find_user(nick_from_host($origin)), $this->find_chan($chan));
+    }
 );
 
 %_commands = (
