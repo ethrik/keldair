@@ -67,6 +67,12 @@ has 'modes' => (
 	}
 );
 
+has 'account' => (
+    isa => 'Str',
+    is => 'rw',
+    required => 0
+);
+
 ## isa(str)
 # @isa If this equals 'user', it will return 1
 sub isa {
