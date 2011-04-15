@@ -57,10 +57,11 @@ if ($option_i) {
         $path{mod} = "/usr/lib/perl5/site_perl/Keldair/Module" if $Bin eq "/usr/bin" && $> == 0;
         $path{mod} = "$ENV{HOME}/.keldair/lib/Keldair/Module" if $Bin eq "/usr/bin" && $> != 0;
 
-	my $res = $furl->get($repo);
-	die $res->status_line unless $res->is_success;
+	my $res = $furl->get("$repo/$location/$module.pm");
+    die $res->status_line unless $res->is_success;
     my $folder = ucfirst $location;
-	open(my $fh, '>', "$path{mod}/$folder/$module.pm")
+	mkdir "$path{mod}/$folder" unless (-d "$path{mod}/$folder" );
+    open(my $fh, '>', "$path{mod}/$folder/$module.pm")
 	  or die("Cannot open file: $!");
 	print {$fh} $res->content;
 	close($fh) or die("Cannot close file: $!");
