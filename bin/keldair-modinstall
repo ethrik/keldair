@@ -100,7 +100,7 @@ if ($option_l) {
         agent => "KeldairModinstall/$VERSION",
         timeout => 10
     );
-    my $res = $furl->get($repo);
+    my $res = $furl->get($repo.'/LIST');
     die $res->status_line unless $res->is_success;
     print $res->content;
 }
