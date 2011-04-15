@@ -12,8 +12,7 @@ use Furl;
 
 our $VERSION = '0.1.1';
 
-GetOptions( 'i=s' => \my $option_i, 's=s' => \my $option_s, 'v' => \my $option_v, 'h' => \my $option_h, 'l' => \my $option_l ) or exit(1);
-
+GetOptions( 'i=s' => \my $option_i, 's=s' => \my $option_s, 'v' => \my $option_v, 'h' => \my $option_h, 'l' => \my $option_l, 'r=s' => \my $option_r ) or exit(1);
 
 if ($option_v) { print <<ENDVER;
 
@@ -33,10 +32,15 @@ Usage: $0 -[v|h|i [argument]]
    -i	Installs the Keldair module specified in the argument.
    -l   Lists all available modules.
    -s   Searches for the pattern specified by the regex in the argument.
+   -r   Specify the repo URL.
 
 ENDHELP
 exit(1);
 }
+
+my $repo = 'https://github.com/ethrik/kmods/raw/master';
+
+$repo = $option_r if $option_r;
 
 if ($option_i) {
 	my ($location,$module) = split('/',$option_i);
@@ -53,13 +57,14 @@ if ($option_i) {
         $path{mod} = "/usr/lib/perl5/site_perl/Keldair/Module" if $Bin eq "/usr/bin" && $> == 0;
         $path{mod} = "$ENV{HOME}/.keldair/lib/Keldair/Module" if $Bin eq "/usr/bin" && $> != 0;
 
-	my $res = $furl->get("https://github.com/ethrik/kmods/raw/master/$location/$module.pm");
+	my $res = $furl->get($repo);
 	die $res->status_line unless $res->is_success;
-	open(my $fh, '>', "$path{mod}/$module.pm")
+    my $folder = ucfirst $location;
+	open(my $fh, '>', "$path{mod}/$folder/$module.pm")
 	  or die("Cannot open file: $!");
 	print {$fh} $res->content;
 	close($fh) or die("Cannot close file: $!");
-	open(my $file, '<', "$path{mod}/$module.pm");
+	open(my $file, '<', "$path{mod}/$folder/$module.pm");
 	while (my $line = <$file>) {
 		if ($line =~ /# modreq: (.*)/i) {
 			my @mods = split(',',$1);
@@ -72,11 +77,9 @@ if ($option_i) {
 		}
 		if ($line =~ /# modconf: (.*)/i) {
 			my $modconf = $1;
-			open(my $config,'>>', $path{config}) or die("Cannot open config: $!");
-			say {$config} $modconf;
-			close $config;
-		}
-	}
+		    say "$module requires the following additional config values: $modconf";
+        }
+	}   
 	close($file);
 }
 
@@ -97,7 +100,7 @@ if ($option_l) {
         agent => "KeldairModinstall/$VERSION",
         timeout => 10
     );
-    my $res = $furl->get('https://github.com/ethrik/kmods/raw/master/LIST');
+    my $res = $furl->get($repo);
     die $res->status_line unless $res->is_success;
     print $res->content;
 }
