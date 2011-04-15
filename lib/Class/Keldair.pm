@@ -246,7 +246,8 @@ sub connect {
 	my ($this, $network) = @_;
 	if ($this->conf->get("networks/$network")) {
 		$this->manager->add(name => $network, addr => $this->conf->get("networks/$network/server/host"), port => $this->conf->get("networks/$network/server/port"),
-            bind => (defined $this->conf->get("networks/$network/server/vhost") ? $this->conf->get("networks/$network/server/vhost") : '0.0.0.0') ) 
+            bind => (defined $this->conf->get("networks/$network/server/vhost") ? $this->conf->get("networks/$network/server/vhost") : '0.0.0.0'),
+            ssl => $this->conf->get("networks/$network/server/ssl") ) 
             and return 1 or return 0;
 	}
 	return;
@@ -265,7 +266,8 @@ sub modload {
 	}
 
     my $modres = eval {
-        load("Keldair::Module::$module");
+        my ( $folder, $mod ) = split('/', $module);
+        load("Keldair::Module::".ucfirst($folder)."::$mod");
         return 1;
         0;
     };
