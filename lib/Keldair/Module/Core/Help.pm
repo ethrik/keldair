@@ -1,7 +1,7 @@
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
 
-package Keldair::Module::Help;
+package Keldair::Module::Core::Help;
 use Keldair;
 use strict;
 use warnings;

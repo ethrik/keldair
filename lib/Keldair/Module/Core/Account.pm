@@ -1,7 +1,7 @@
 # Copyright 2011 Ethrik Project, et al.
 # Licensed under the 3-clause BSD.
 
-package Keldair::Module::Account;
+package Keldair::Module::Core::Account;
 use strict;
 use warnings;
 use Keldair;
