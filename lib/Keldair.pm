@@ -63,10 +63,6 @@ sub HOOK_DENY_EAT () { -2; } # Do not allow action to proceed, and eat event.
 sub HOOK_PASS_EAT () { -1; } # Allow action to proceed, and eat event.
 
 
-# Timer constant magics.
-sub TIMER_ONCE () { 1; } # Have the timer only run once.
-sub TIMER_REPEAT () { 2; } # Have the timer repeat continuously.
-
 # DENY = 1/-1
 # PASS = 2/-1
 
