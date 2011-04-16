@@ -40,6 +40,7 @@ sub cmd_identify {
     if ( check( $username, $password ) ) { 
 
         $origin->account($username);
+        $keldair->hook_run(OnLogin => $network, $origin, $username);
         my @notify = split /\,/, $account{ lc $username }{identified};
 
         $account{ lc($username) }{identified} .= ',' . $network.'/'.$origin->nick;
