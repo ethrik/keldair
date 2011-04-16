@@ -18,6 +18,20 @@ foreach my $cmd ( qw/ IDENTIFY LOGIN / ) {
     $keldair->help_add( $cmd => 'Identify to Keldair.' );
     $keldair->syntax_add( $cmd => "$cmd <username> <password>" );
 }
+$keldair->command_bind(LOGOUT => \&cmd_logout);
+$keldair->help_add(LOGOUT => 'Log out of a Keldair account.');
+
+sub cmd_logout {
+    my ( $network, $channel, $origin, $message ) = @_;
+    if ( !$origin->account ) {
+        $keldair->notice( $network, $origin, 'You are not logged in.' );
+    }
+    else {
+        $keldair->hook_run(OnLogout => $network, $origin, $origin->account);
+        $origin->account('');
+        $keldair->notice( $network, $origin, 'You have been logged out.' );
+    }
+}
 
 sub cmd_identify {
     my ( $network, $channel, $origin, $message ) = @_;
