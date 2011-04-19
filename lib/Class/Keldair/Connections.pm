@@ -32,7 +32,7 @@ sub del {
 	return 0 if !$params{name};
 	return 0 if !$self->{selector}->exists($self->{sockets}->{$params{name}}) and !defined $self->{sockets}->{$params{name}};
 	delete $self->{sockets}->{$params{name}};
-	$self->{selector}->remove($self->{sockets}->{params{name}}) and return 1;
+	$self->{selector}->remove($self->{sockets}->{params{'name'}}) and return 1;
 	return;
 }
 
