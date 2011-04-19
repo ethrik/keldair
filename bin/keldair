@@ -13,11 +13,11 @@ my $pid = $$;
 
 BEGIN
 {
-    unshift @INC, "$Bin/../lib" if $Bin ne "/usr/bin";
-    unshift @INC, "$ENV{HOME}/.keldair/lib" if $Bin eq "/usr/bin";
+    unshift @INC, "$Bin/../lib" if $Bin ne '/usr/bin';
+    unshift @INC, "$ENV{HOME}/.keldair/lib" if $Bin eq '/usr/bin';
     local $0 = 'keldair';
     my $pidf = "$Bin/../etc/keldair.pid";
-    $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
+    $pidf = "$ENV{HOME}/.keldair/keldair.pid" if $Bin eq '/usr/bin';
     open my $pidfile, '>', $pidf
         or die "Cannot open pidfile $pidf";
     print {$pidfile} $$;
@@ -29,9 +29,9 @@ use Keldair::CoreCommands;
 use Keldair::State;
 
 our ($dbug, $cfile);
-GetOptions("debug!" => \$dbug, "config=s" => \$cfile);
+GetOptions('debug!' => \$dbug, 'config=s' => \$cfile);
 $keldair->debug($dbug) if defined $dbug;
-$cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
+$cfile = $Bin eq '/usr/bin/' ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
 $keldair->conf(Config::JSON->new($cfile));
 
 open STDIN, '<', '/dev/null' or croak( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
@@ -99,7 +99,7 @@ END
 {
     $keldair->hook_run('OnEnd');
     my $pidf = "$Bin/../etc/keldair.pid";
-    $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
+    $pidf = "$ENV{HOME}/.keldair/keldair.pid" if $Bin eq '/usr/bin';
     unlink $pidf;
     $keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
 }
