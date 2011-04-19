@@ -3,6 +3,7 @@
 # Licensed under the 3-clause BSD.
 use strict;
 use warnings;
+use Carp qw( carp croak );
 use FindBin qw($Bin);
 use POSIX qw(BUFSIZ);
 use Getopt::Long;
@@ -17,10 +18,10 @@ BEGIN
     local $0 = 'keldair';
     my $pidf = "$Bin/../etc/keldair.pid";
     $pidf = $ENV{HOME}."/.keldair/keldair.pid" if $Bin eq "/usr/bin";
-    open (my $pidfile, '>', $pidf)
-        or die("Cannot open pidfile $pidf");
+    open my $pidfile, '>', $pidf
+        or die "Cannot open pidfile $pidf";
     print {$pidfile} $$;
-    close $pidfile or die("Cannot close pidfile.\n");
+    close $pidfile or die "Cannot close pidfile.\n";
 }
 
 use Keldair;
@@ -33,12 +34,12 @@ $keldair->debug($dbug) if defined $dbug;
 $cfile = $Bin eq "/usr/bin/" ? "$ENV{HOME}/.keldair/keldair.conf" : "$Bin/../etc/keldair.conf" if !$cfile;
 $keldair->conf(Config::JSON->new($cfile));
 
-open STDIN, '<', '/dev/null' or die( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
-open STDOUT, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
-open STDERR, '>>', '/dev/null' or die( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
+open STDIN, '<', '/dev/null' or croak( "Can't read /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
+open STDOUT, '>>', '/dev/null' or croak( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
+open STDERR, '>>', '/dev/null' or croak( "Can't write to /dev/null: $!" ) unless $^O eq 'MSWin32' or $keldair->debug;
 fork and exit unless $^O eq 'MSWin32' or $keldair->debug; # This cannot be compressed into one, you have to break it into a few lines. We will never reach $keldair->debug
 
-our $VERSION = $Keldair::VERSION;
+our $VERSION = '3.9.2';
 
 $Keldair::State::STATS{'start'} = time;
 
@@ -67,8 +68,8 @@ while (1) {
 	    $Keldair::State::STATS{$network}{'inL'}++;
 	    if ($Keldair::State::STATS{$network}{'inL'} == 1) { $keldair->hook_run('OnPreConnect' => $network); }
             my $line = $1;
-            $Keldair::State::STATS{'inB'} += length($line);
-            $Keldair::State::STATS{$network}{'inB'} += length($line);
+            $Keldair::State::STATS{'inB'} += length $line;
+            $Keldair::State::STATS{$network}{'inB'} += length $line;
             $line =~ s/(\r\n)//g;
             say "<$network> R: $line" if $keldair->debug;
             $keldair->parse($network, $line);
@@ -81,7 +82,7 @@ while (1) {
 # Kill the first PID we had
 $SIG{CHLD} = sub {
     print "CHLD - KILLING $pid\n";
-    kill(TERM => $pid);
+    kill 'TERM', $pid;
 };
 
 $SIG{TERM} = sub {
