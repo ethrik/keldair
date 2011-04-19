@@ -46,7 +46,7 @@ $keldair->hook_add(OnMessage => sub {
             }
         }
         else {
-            next;
+            return;
         }
     });
 
