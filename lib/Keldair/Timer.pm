@@ -27,7 +27,7 @@ sub after {
     my ( $self, $wait, $code ) = @_;
     return if ( !$wait || !$code );
     $self->create(TIMER_ONCE, $wait, $code) or return;
-    return 1;
+    return $code;
 }
 
 #
@@ -37,7 +37,7 @@ sub every {
     my ( $self, $wait, $code ) = @_;
     return if ( !$wait || !$code );
     $self->create(TIMER_REPEAT, $wait, $code ) or return;
-    return 1;
+    return $code;
 }
 
 #
@@ -71,10 +71,10 @@ sub delete {
 
   delete $repeatable{$code};
   delete $waiting{$code};
+  return 1;
 }
 
 sub run {
-    printf("TIMER WAS RAN BY %s!\n", caller());
     my $time = time;
     foreach my $key (keys %timers) {
         if ($time == $key) {
@@ -91,6 +91,7 @@ sub run {
             delete $timers{$time};
         }
     }
+    return 1;
 }
 
 1;
