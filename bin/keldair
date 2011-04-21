@@ -25,6 +25,7 @@ BEGIN
 }
 
 use Keldair;
+use Keldair::Timer;
 use Keldair::CoreCommands;
 use Keldair::State;
 
@@ -47,6 +48,7 @@ my $modules = $keldair->config('modules');
 $keldair->modload($_) foreach @{ $modules };
 $keldair->hook_run('OnStart');
 $keldair->hook_run('OnRehash');
+my $timer = Keldair::Timer->new;
 my $manager = $keldair->manager;
 
 foreach (keys %{ $keldair->config('networks') }) {
@@ -57,6 +59,7 @@ foreach (keys %{ $keldair->config('networks') }) {
 }
 
 while (1) {
+    $timer->run;
     foreach my $sock ($keldair->manager->{selector}->can_read(1)) {
         my $network;
         foreach (keys %{$keldair->manager->{sockets}}) {

@@ -31,4 +31,5 @@ Thank you for following our humble requests, happy hacking!
 
 =head3 MENTIONS
 
+Thanks to Steve Belcher (sycobuny), for being a MASSIVE help, especially with Timer.pm.
 Thanks to Cory Smelosky (gewt), author of b4bot, who we borrowed some module ideas from.
