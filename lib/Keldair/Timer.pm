@@ -63,7 +63,7 @@ sub delete {
     INNER: for (my $x = 0; $timers{$time}[$x]; $x++) {
       if ($timers{$time}[$x] == $code) {
         delete $timers{$time}[$x];
-        delete $timers[$time} unless (scalar(@{ $timers{$time} }));
+        delete $timers{$time} unless (scalar(@{ $timers{$time} }));
         last OUTER;
       }
     }
