@@ -51,7 +51,7 @@ sub create {
         $repeatable{$code} = $repeat;
         $waiting{$code} = $wait;
     }
-    push $timers{ time + $wait }, $code;
+    push @{ $timers{ time + $wait } }, $code;
     return 1;
 }
 
@@ -82,7 +82,7 @@ sub run {
                 my ($code) = shift @{ $timers{$time} };                
                 $code->();
                 if (--$repeatable{$code}) {
-                    push $timers{time + $waiting{$code}}, $code;
+                    push @{ $timers{time + $waiting{$code}} }, $code;
                 } else {
                   delete $repeatable{$code};
                   delete $waiting{$code};
