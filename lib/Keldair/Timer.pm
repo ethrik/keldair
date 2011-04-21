@@ -55,17 +55,37 @@ sub create {
     return 1;
 }
 
+sub delete {
+  my ( $self, $code ) = @_;
+  return if ( !$code );
+
+  OUTER: foreach my $time (keys %timers) {
+    INNER: for (my $x = 0; $timers{$time}[$x]; $x++) {
+      if ($timers{$time}[$x] == $code) {
+        delete $timers{$time}[$x];
+        delete $timers[$time} unless (scalar(@{ $timers{$time} }));
+        last OUTER;
+      }
+    }
+  }
+
+  delete $repeatable{$code};
+  delete $waiting{$code};
+}
+
 sub run {
     printf("TIMER WAS RAN BY %s!\n", caller());
     my $time = time;
     foreach my $key (keys %timers) {
         if ($time == $key) {
-            foreach my $code ( @{ $timers{$time} } ) {
+            while (@{ $timers{$time} }) {
+                my ($code) = shift @{ $timers{$time} };                
                 $code->();
                 if (--$repeatable{$code}) {
                     push $timers{time + $waiting{$code}}, $code;
                 } else {
                   delete $repeatable{$code};
+                  delete $waiting{$code};
                 }
             }
             delete $timers{$time};
