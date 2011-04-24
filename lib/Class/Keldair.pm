@@ -271,22 +271,14 @@ sub modload {
         return 1;
         0;
     };
-    if ($modres == 1) {
+    if ($modres) {
         $this->logf(MODLOAD => 'Successfully loaded %s from Keldair::Module.', $module);
         return 1;
     }
     else {
-        my $_modres = eval {
-            load($module);
-            return 1;
-            0;
-        };
-        if ($_modres == 1) {
-            $this->logf(MODLOAD => 'Successfully loaded %s - consider moving it to: lib/Keldair/Module.', $module);
-            return 1;
-        }
+        warn "Failed to load $module. Error: $@";
+        $this->logf(MODLOAD => 'Failed to load %s. Error: %s', $module, $@);
     }
-    $this->logf(MODLOAD => 'Failed to load %s. Error: %s', $module, $@);
 }
 
 
