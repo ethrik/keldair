@@ -32,6 +32,7 @@ $keldair->hook_add(OnMessage => sub {
 
             my $trig_and_cmd = length($cmd) + length($trigger);
             my $args = substr $msg, $trig_and_cmd;
+            $args =~ s/^ // if $args =~ /^ /;
             my @args = split ' ', $args;
 
             my $exec_cmd = $keldair->command_get(uc $cmd);
