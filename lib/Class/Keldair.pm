@@ -169,7 +169,9 @@ sub hook_run {
 
 		if($_event eq $event)
 		{
-			my $res = $hook->[1]->(@args);
+			my $res = eval { $hook->[1]->(@args) }
+                or $this->log(ERROR => $hook->[0]." has errored: $@") and 
+                return;
 		
 			if(defined $res)
 			{
