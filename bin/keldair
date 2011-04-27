@@ -59,7 +59,7 @@ foreach (keys %{ $keldair->config('networks') }) {
 }
 
 while (1) {
-    $timer->run;
+    eval { $timer->run } or warn "A timer made a fail! $@";
     foreach my $sock ($keldair->manager->{selector}->can_read(1)) {
         my $network;
         foreach (keys %{$keldair->manager->{sockets}}) {
