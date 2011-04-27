@@ -249,7 +249,7 @@ sub connect {
 	if ($this->conf->get("networks/$network")) {
 		$this->manager->add(name => $network, addr => $this->conf->get("networks/$network/server/host"), port => $this->conf->get("networks/$network/server/port"),
             bind => (defined $this->conf->get("networks/$network/server/vhost") ? $this->conf->get("networks/$network/server/vhost") : '0.0.0.0'),
-            ssl => $this->conf->get("networks/$network/server/ssl") ) 
+            ssl => ($this->conf->get("networks/$network/server/ssl") ? 1 : 0) ) 
             and return 1 or return 0;
 	}
 	return;

@@ -66,7 +66,7 @@ while (1) {
             if ($keldair->manager->{sockets}->{$_} eq $sock) { $network = $_; }
 	}
         my $buffer;
-        recv $sock, $buffer, BUFSIZ, 0;
+        sysread $sock, $buffer, BUFSIZ, 0;
         while ($buffer =~ s/(.*\n)//) {
 	    $Keldair::State::STATS{$network}{'inL'}++;
 	    if ($Keldair::State::STATS{$network}{'inL'} == 1) { $keldair->hook_run('OnPreConnect' => $network); }
