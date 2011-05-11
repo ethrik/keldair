@@ -35,6 +35,11 @@ $keldair->hook_add(OnMessage => sub {
             $args =~ s/^ // if $args =~ /^ /;
             my @args = split ' ', $args;
 
+            if (!defined $cmd)
+            {
+                return; # Someone just said something that started with the trigger and nothing else
+            }
+
             my $exec_cmd = $keldair->command_get(uc $cmd);
 
             if($exec_cmd) {
