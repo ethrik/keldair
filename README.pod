@@ -1,9 +1,5 @@
 =encoding utf8
 
-=head1 STATUS
-
-Dead - [00:23:32] <matthew@redacted> lets quit keldair
-
 =head1 NAME
 
 Keldair - A sexy IRC Bot in Perl.
