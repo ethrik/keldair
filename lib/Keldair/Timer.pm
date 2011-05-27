@@ -7,6 +7,7 @@ use strict;
 package Keldair::Timer;
 
 use Scalar::Util;
+use Glib;
 
 our (%timers, %repeatable, %waiting);
 
@@ -51,6 +52,7 @@ sub create {
         $repeatable{$code} = $repeat;
         $waiting{$code} = $wait;
     }
+    $timers{ time + $wait } ||= [];
     push @{ $timers{ time + $wait } }, $code;
     return 1;
 }
@@ -82,6 +84,7 @@ sub run {
                 my ($code) = shift @{ $timers{$time} };                
                 $code->();
                 if (--$repeatable{$code}) {
+                    $timers{ time + $waiting{$code} } ||= [];
                     push @{ $timers{time + $waiting{$code}} }, $code;
                 } else {
                   delete $repeatable{$code};
