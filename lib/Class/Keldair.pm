@@ -11,8 +11,6 @@ use Class::Keldair::Connections;
 
 with 'Class::Keldair::Parser', 'Class::Keldair::Interface', 'Class::Keldair::Commands';
 
-my $manager = Class::Keldair::Connections->new;
-
 # someone will probably want to move this to a different location later...
 my $conf = "$Bin/../etc/keldair.conf";
 $conf = $ENV{HOME}."/.keldair/keldair.conf" if $Bin eq "/usr/bin";
@@ -27,58 +25,12 @@ has 'conf' => (
 	required => 1
 );
 
-=comment
-## nick(str)
-# Nickname to register with - this may be truncated depending on length limit on server.
-# @default Nick as found in keldair.conf
-has 'nick' => (
-	isa => 'Str',
-	is => 'rw',
-	required => 1,
-	default => sub {
-		my $this = shift;
-		$this->conf->get('keldair/nick');
-	}
+has 'manager' => (
+    isa => 'Object',
+    is => 'ro',
+    default => sub { new Class::Keldair::Connections },
+    required => 1
 );
-
-## ident(str)
-# "Username" to register connection with. May NOT have spaces
-# @default Ident found in keldair.conf
-has 'ident' => (
-	isa => 'Str',
-	is => 'rw',
-	required => 1,
-	default => sub {
-		my $this = shift;	
-		$this->conf->get('keldair/ident');
-	}
-);
-
-## realname(str)
-# GECOS for the bot client
-# @default Find the realname string from keldair.conf
-has 'realname' => (
-	isa => 'Str',
-	required => 1,
-	is => 'rw',
-	default => sub {
-		my $this = shift;
-		$this->conf->get('keldair/realname');
-	}
-);
-
-## home(str)
-# Home channel to join when bot gets connected to the server
-# @default Configuration value
-has 'home' => (
-	isa => 'Str',
-	is => 'rw',
-	default => sub {
-		my $this = shift;
-		$this->conf->get('keldair/home');
-	}
-);
-=cut
 
 ## debug(int)
 # Print IRC Input / Output between client and server
@@ -201,12 +153,6 @@ sub hook_run {
 sub config {
 	my ($this, $directive) = @_;
 	return $this->conf->get($directive);
-}
-
-## manager()
-# Returns the manager instance
-sub manager {
-	return $manager;
 }
 
 ## log(str, str, int)
