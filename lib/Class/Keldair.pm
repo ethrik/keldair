@@ -25,6 +25,8 @@ has 'conf' => (
 	required => 1
 );
 
+## manager()
+# Creates the socket manager that is individual for each bot now.
 has 'manager' => (
     isa => 'Object',
     is => 'ro',
