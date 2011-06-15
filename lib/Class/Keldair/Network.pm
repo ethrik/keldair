@@ -20,3 +20,19 @@ has channels => (
     }
 );
 
+# ditto
+
+has users => (
+    traits  =>  ['Hash'],
+    is      =>  'ro',
+    isa     =>  'HashRef[Object]',
+    default =>  sub { {} },
+    handles =>  {
+        add_user     =>  'set',
+        del_user     =>  'delete',
+        find_user    =>  'get',
+        no_users     =>  'is_empty',
+        list_users   =>  'kv',
+        user_count   =>  'count'
+    }
+);
