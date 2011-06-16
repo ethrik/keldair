@@ -21,3 +21,51 @@ has networks => (
         network_list    =>  'kv'
     }
 );
+
+## commands
+# Commands are stored in this way:
+has commands => (
+    traits  =>  ['Hash'],
+    is      =>  'ro',
+    isa     =>  'HashRef[Code]',
+    default =>  sub { {} },
+    handles =>  {
+        add_command     =>  'set',
+        command_find    =>  'get',
+        no_commands     =>  'is_empty',
+        command_count   =>  'count',
+        command_del     =>  'delete',
+        command_list    =>  'kv',
+    }
+);
+## command_add(): This is confusing! This must be used to add commands directly.
+# Old API: $keldair->command_add(PING => sub { ... });
+# New API: $keldair->command_add({ cmd => 'ping', help => 'Check connectivity of bot or user.', code => sub { ... }, ...}[, ...]);
+## this method is trained to search for both! It checks the first element to see if it is a HASH. If so, the rest of the elemnts are treated as such. Otherwise, it assumes the rest are using the old API, and there only be two elements (arguments) passed.
+## confused?
+
+sub command_add {
+    my $self = shift;
+    
+    my $first = shift;
+    if(ref($first) eq 'HASH')
+    {
+        print "Using new command API for $first->{name} and all commands added in this instance.\n";
+        $self->add_command(uc($first->{name}), $first);
+        for (@_)
+        {
+            $self->add_command(uc($_->{name}), $first);
+        }
+    }
+    else
+    {
+        print "Using old command API for $first\n";
+        if(ref($_[1]) ne 'CODE')
+        {
+            print "command_add(): second argument must be a CODE reference, not ".ref($_[1])."\n";
+            return;
+        }
+        $self->add_command(uc($first), $_[1]);
+    }
+}
+
