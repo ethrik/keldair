@@ -38,12 +38,12 @@ has commands => (
         command_list    =>  'kv',
     }
 );
+
 ## command_add(): This is confusing! This must be used to add commands directly.
 # Old API: $keldair->command_add(PING => sub { ... });
 # New API: $keldair->command_add({ cmd => 'ping', help => 'Check connectivity of bot or user.', code => sub { ... }, ...}[, ...]);
 ## this method is trained to search for both! It checks the first element to see if it is a HASH. If so, the rest of the elemnts are treated as such. Otherwise, it assumes the rest are using the old API, and there only be two elements (arguments) passed.
 ## confused?
-
 sub command_add {
     my $self = shift;
     
