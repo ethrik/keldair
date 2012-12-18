@@ -205,32 +205,33 @@ sub connect {
 
 sub modload {
 	my ($this, $module) = @_;
-	my $class = caller;
+	my $caller = caller() ? caller() : "NONE";
+	warn "$caller called modload() without a module" and return if !$module;
 	
-	my $res = $this->hook_run(OnPreModLoad => $module);
-	
-	if($res < 0)
-	{
-		$this->log(HOOK_EATEN => "OnPreModLoad: Not loading $module; stopped by $class.");
-		return 0;
+	my $res = $this->hook_run(OnPreModLoad => $module); ## allows modules to stop from loading clashing modules
+
+	if ($res < 0) {
+		$this->log(HOOK_EATEN => "modload(): stopped by $module from $caller");
+		return
 	}
 
-    my $modres = eval {
-        my ( $folder, $mod ) = split('/', $module);
-        load("Keldair::Module::".ucfirst($folder)."::$mod");
-        return 1;
-        0;
-    };
-    if ($modres) {
-        $this->logf(MODLOAD => 'Successfully loaded %s from Keldair::Module.', $module);
-        return 1;
-    }
-    else {
-        warn "Failed to load $module. Error: $@";
-        $this->logf(MODLOAD => 'Failed to load %s. Error: %s', $module, $@);
-    }
-}
+	my $try_module_load = eval {
+		$module = 'Keldair/Module/'.$module;
+		$module =~ s#::#/#g; ## convert '::' to /s
+		$module .= '.pm';
 
+		load $module; ## Module::Load library
+		1
+	};
+
+	if($try_module_load) {
+		$this->logf(MODLOAD => 'Loaded %s', $module);
+		1
+	} else {
+		$this->logf(MODLOAD => 'Could not load %s: %s', $module, $!);
+		0
+	}
+}
 
 # TODO: Turn CTCP into a hashref trait like hooks, etc., unless its not possible
 sub ctcp_add {

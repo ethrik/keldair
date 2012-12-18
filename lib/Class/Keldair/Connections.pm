@@ -27,7 +27,14 @@ sub add {
         binmode( $self->{sockets}->{$params{name}}, ':encoding(UTF-8)');
     }
     else {
-        $self->{sockets}->{$params{name}} = IO::Socket::SSL->new(Proto => 'tcp', PeerAddr => $params{addr}, PeerPort => $params{port}, Timeout => (defined $params{timeout} ? $params{timeout} : 30), LocalHost => (defined $params{bind} ? $params{bind} : '0.0.0.0')) or say ("ERROR: $@") and return 0;
+        $self->{sockets}->{$params{name}} = IO::Socket::SSL->new(
+		Proto => 'tcp', 
+		PeerAddr => $params{addr}, 
+		PeerPort => $params{port}, 
+		Timeout => (defined $params{timeout} ? $params{timeout} : 30), 
+		LocalHost => (defined $params{bind} ? $params{bind} : '0.0.0.0'),
+		SSL_verify_mode => 'SSL_VERIFY_NONE',
+	) or say ("ERROR: $@") and return 0;
     }   
 	$self->{selector}->add($self->{sockets}->{$params{name}}) and return $self->{sockets}->{$params{name}} or say("ERROR: $!") and return 0;
 	return;

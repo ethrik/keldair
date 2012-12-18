@@ -106,3 +106,4 @@ END
     unlink $pidf;
     $keldair->log(INFO => 'Keldair shutdown complete; closing errors: '.($@ ? $@ : 'none'));
 }
+

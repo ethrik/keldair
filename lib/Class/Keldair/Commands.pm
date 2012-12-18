@@ -52,6 +52,8 @@ sub msg {
 	my $network = shift;
 	my $target = shift;
 	my $msg = sprintf(shift @_, @_);
+
+	return if !defined $msg;
 	
 	my $res = $this->hook_run(OnBotPreMessage => $network, $target, $msg);
 	
@@ -80,6 +82,8 @@ sub notice {
 	my $network = shift;
 	my $target = shift;
 	my $msg = sprintf(shift @_, @_);
+
+	return if !defined $msg;
 
 	my $res = $this->hook_run(OnBotPreNotice => $network, $target, $msg);
 	

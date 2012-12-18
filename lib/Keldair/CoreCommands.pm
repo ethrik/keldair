@@ -37,7 +37,7 @@ $keldair->hook_add(OnMessage => sub {
 
             if (!defined $cmd)
             {
-                return; # Someone just said something that started with the trigger and nothing else
+                return 'trigger without a command? - probably an accident'; # Someone just said something that started with the trigger and nothing else
             }
 
             my $exec_cmd = $keldair->command_get(uc $cmd);
